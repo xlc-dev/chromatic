@@ -8,6 +8,7 @@ import ImportJSON from "./components/ImportJSON";
 import ConfirmDialog from "./components/ConfirmDialog";
 import PresetSelector from "./components/PresetSelector";
 import { processImageFile } from "./utils/imageProcessor";
+import { shouldSkipConfirmation } from "./utils/confirmation";
 
 const BASE_URL = import.meta.env["BASE_URL"];
 const faviconUrl = `${BASE_URL}favicon.svg`;
@@ -101,7 +102,11 @@ export default function App() {
   };
 
   const handleResetClick = () => {
-    setShowResetDialog(true);
+    if (shouldSkipConfirmation("reset")) {
+      setScheme(defaultColorScheme);
+    } else {
+      setShowResetDialog(true);
+    }
   };
 
   const handleResetConfirm = () => {
@@ -115,7 +120,13 @@ export default function App() {
   };
 
   const handleImageExtractClick = () => {
-    setShowImageExtractDialog(true);
+    if (shouldSkipConfirmation("image")) {
+      if (imageInputRef) {
+        imageInputRef.click();
+      }
+    } else {
+      setShowImageExtractDialog(true);
+    }
   };
 
   const handleImageExtractConfirm = () => {
@@ -217,6 +228,7 @@ export default function App() {
         message="Are you sure you want to reset all colors to default? This will discard all your changes."
         confirmText="Reset"
         cancelText="Cancel"
+        storageKey="reset"
         onConfirm={handleResetConfirm}
         onCancel={() => setShowResetDialog(false)}
       />
@@ -226,6 +238,7 @@ export default function App() {
         message="This will replace your current colorscheme with colors extracted from the image. All your current changes will be lost."
         confirmText="Continue"
         cancelText="Cancel"
+        storageKey="image"
         onConfirm={handleImageExtractConfirm}
         onCancel={() => setShowImageExtractDialog(false)}
       />

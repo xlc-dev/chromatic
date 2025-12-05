@@ -1,6 +1,8 @@
 import { For, createSignal, Show } from "solid-js";
 import type { ColorScheme } from "../types";
 import presetsData from "../data/presets.json";
+import ConfirmDialog from "./ConfirmDialog";
+import { shouldSkipConfirmation } from "../utils/confirmation";
 
 interface Preset {
   name: string;
@@ -14,11 +16,29 @@ interface PresetSelectorProps {
 
 export default function PresetSelector(props: PresetSelectorProps) {
   const [isOpen, setIsOpen] = createSignal(false);
+  const [pendingPreset, setPendingPreset] = createSignal<Preset | null>(null);
   const presets = presetsData as Preset[];
 
   const handleSelect = (preset: Preset) => {
-    props.onSelect(preset.scheme);
-    setIsOpen(false);
+    if (shouldSkipConfirmation("preset")) {
+      props.onSelect(preset.scheme);
+      setIsOpen(false);
+    } else {
+      setPendingPreset(preset);
+    }
+  };
+
+  const handleConfirm = () => {
+    const preset = pendingPreset();
+    if (preset) {
+      props.onSelect(preset.scheme);
+      setPendingPreset(null);
+      setIsOpen(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setPendingPreset(null);
   };
 
   return (
@@ -147,6 +167,16 @@ export default function PresetSelector(props: PresetSelectorProps) {
           </div>
         </div>
       </Show>
+      <ConfirmDialog
+        open={pendingPreset() !== null}
+        title="Apply Preset"
+        message={`This will replace your current colorscheme with "${pendingPreset()?.name}". All your current changes will be lost.`}
+        confirmText="Apply"
+        cancelText="Cancel"
+        storageKey="preset"
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </>
   );
 }
