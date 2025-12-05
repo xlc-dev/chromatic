@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "prettier": "^3.7.4",
-    "vite": "^5.4.21",
+    "vite": "^7.2.6",
     "vite-plugin-solid": "^2.11.10",
     "typescript": "^5.9.3"
   }
