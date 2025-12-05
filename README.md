@@ -10,11 +10,6 @@
   Finally a normal colorscheme generator for Linux.
 </p>
 
-<p align="center">
-  <a href="./LICENSE"><img src="https://img.shields.io/github/license/xlc-dev/chromatic?style=for-the-badge&color=blue" alt="License"></a>
-  <a href="https://github.com/xlc-dev/chromatic/stargazers"><img src="https://img.shields.io/github/stars/xlc-dev/chromatic?style=for-the-badge&color=gold&logo=github" alt="GitHub Stars"></a>
-</p>
-
 ---
 
 Chromatic is a modern, web-based colorscheme generator designed specifically for Linux users. Create, customize, and export colorschemes for your terminal, window manager, and other applications with an intuitive visual interface.
