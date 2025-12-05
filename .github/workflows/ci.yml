@@ -57,23 +57,15 @@ jobs:
           path: chromatic
           retention-days: 30
 
-  release:
-    needs: lint-and-build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'release'
-    steps:
-      - name: Download CLI binary
-        uses: actions/download-artifact@v6
-        with:
-          name: chromatic-cli
-          path: .
-
-      - name: Create release asset
+      - name: Prepare release assets
+        if: github.event_name == 'release'
         run: |
-          tar -czf chromatic-linux-x64.tar.gz chromatic
+          chmod +x dist/chromatic
+          tar -czf chromatic-linux-x64.tar.gz -C dist chromatic
           sha256sum chromatic-linux-x64.tar.gz > chromatic-linux-x64.tar.gz.sha256
 
       - name: Upload release asset
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           files: |
