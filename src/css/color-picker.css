@@ -409,17 +409,3 @@
 .color-picker-number-input:focus-within {
   border-color: #58a6ff;
 }
-
-.color-picker-hex-input {
-  flex: 1;
-  background: #0d1117;
-  border: 1px solid #30363d;
-  border-radius: 4px;
-  padding: 0.5rem;
-  color: #c9d1d9;
-  font-family: "Fira Code", monospace;
-  font-size: 0.85rem;
-  transition: border-color 0.2s ease;
-  box-sizing: border-box;
-  min-width: 0;
-}
