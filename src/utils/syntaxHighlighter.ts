@@ -5,7 +5,16 @@ export interface CodeToken {
   color: ColorSchemeKey;
 }
 
-type Language = "typescript" | "python" | "rust" | "go" | "javascript" | "c" | "cpp" | "zig";
+type Language =
+  | "typescript"
+  | "python"
+  | "rust"
+  | "go"
+  | "javascript"
+  | "c"
+  | "cpp"
+  | "zig"
+  | "java";
 
 const controlFlowKeywords: Record<Language, Set<string>> = {
   typescript: new Set([
@@ -43,6 +52,25 @@ const controlFlowKeywords: Record<Language, Set<string>> = {
     "throw",
     "async",
     "await",
+  ]),
+  java: new Set([
+    "if",
+    "else",
+    "switch",
+    "case",
+    "default",
+    "for",
+    "while",
+    "do",
+    "break",
+    "continue",
+    "return",
+    "try",
+    "catch",
+    "finally",
+    "throw",
+    "throws",
+    "goto",
   ]),
   python: new Set([
     "if",
@@ -161,6 +189,7 @@ const typeKeywords: Record<Language, Set<string>> = {
     "as",
   ]),
   javascript: new Set(["class", "extends", "typeof", "instanceof", "in", "of"]),
+  java: new Set(["byte", "short", "int", "long", "float", "double", "boolean", "char", "void"]),
   python: new Set(["class", "def", "lambda", "None", "True", "False"]),
   rust: new Set(["struct", "enum", "impl", "trait", "type", "dyn", "Self", "self"]),
   go: new Set(["type", "struct", "interface", "func"]),
@@ -204,6 +233,21 @@ const modifierKeywords: Record<Language, Set<string>> = {
     "export",
     "import",
     "from",
+  ]),
+  java: new Set([
+    "public",
+    "private",
+    "protected",
+    "static",
+    "final",
+    "abstract",
+    "synchronized",
+    "volatile",
+    "transient",
+    "native",
+    "strictfp",
+    "sealed",
+    "non-sealed",
   ]),
   python: new Set(["import", "from", "as", "global", "nonlocal", "del"]),
   rust: new Set([
@@ -273,6 +317,7 @@ const modifierKeywords: Record<Language, Set<string>> = {
 const literalKeywords: Record<Language, Set<string>> = {
   typescript: new Set(["true", "false", "null", "undefined"]),
   javascript: new Set(["true", "false", "null", "undefined"]),
+  java: new Set(["true", "false", "null"]),
   python: new Set(["True", "False", "None"]),
   rust: new Set(["true", "false", "Some", "None", "Ok", "Err"]),
   go: new Set(["true", "false", "nil"]),
@@ -303,6 +348,32 @@ const builtins: Record<Language, Set<string>> = {
     "String",
     "Number",
     "Boolean",
+  ]),
+  java: new Set([
+    "class",
+    "interface",
+    "enum",
+    "record",
+    "extends",
+    "implements",
+    "new",
+    "this",
+    "super",
+    "instanceof",
+    "package",
+    "import",
+    "assert",
+    "yield",
+    "module",
+    "requires",
+    "exports",
+    "opens",
+    "uses",
+    "provides",
+    "to",
+    "with",
+    "transitive",
+    "var",
   ]),
   python: new Set([
     "print",
