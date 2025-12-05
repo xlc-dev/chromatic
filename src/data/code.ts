@@ -13,7 +13,16 @@ export interface CodeExample {
   code: string;
 }
 
-export type Language = "typescript" | "python" | "rust" | "go" | "javascript" | "c" | "cpp" | "zig" | "java";
+export type Language =
+  | "typescript"
+  | "python"
+  | "rust"
+  | "go"
+  | "javascript"
+  | "c"
+  | "cpp"
+  | "zig"
+  | "java";
 
 const codeExamples: Record<Language, CodeExample> = {
   typescript: {

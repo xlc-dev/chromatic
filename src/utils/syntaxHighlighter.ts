@@ -5,7 +5,16 @@ export interface CodeToken {
   color: ColorSchemeKey;
 }
 
-type Language = "typescript" | "python" | "rust" | "go" | "javascript" | "c" | "cpp" | "zig" | "java";
+type Language =
+  | "typescript"
+  | "python"
+  | "rust"
+  | "go"
+  | "javascript"
+  | "c"
+  | "cpp"
+  | "zig"
+  | "java";
 
 const controlFlowKeywords: Record<Language, Set<string>> = {
   typescript: new Set([
@@ -61,7 +70,7 @@ const controlFlowKeywords: Record<Language, Set<string>> = {
     "finally",
     "throw",
     "throws",
-    "goto"
+    "goto",
   ]),
   python: new Set([
     "if",
@@ -180,18 +189,7 @@ const typeKeywords: Record<Language, Set<string>> = {
     "as",
   ]),
   javascript: new Set(["class", "extends", "typeof", "instanceof", "in", "of"]),
-  java: new Set([
-      "byte",
-      "short",
-      "int",
-      "long",
-      "float",
-      "double",
-      "boolean",
-      "char",
-      "void"
-    ]
-  ),
+  java: new Set(["byte", "short", "int", "long", "float", "double", "boolean", "char", "void"]),
   python: new Set(["class", "def", "lambda", "None", "True", "False"]),
   rust: new Set(["struct", "enum", "impl", "trait", "type", "dyn", "Self", "self"]),
   go: new Set(["type", "struct", "interface", "func"]),
@@ -237,21 +235,20 @@ const modifierKeywords: Record<Language, Set<string>> = {
     "from",
   ]),
   java: new Set([
-      "public",
-      "private",
-      "protected",
-      "static",
-      "final",
-      "abstract",
-      "synchronized",
-      "volatile",
-      "transient",
-      "native",
-      "strictfp",
-      "sealed",
-      "non-sealed"
-    ]
-  ),
+    "public",
+    "private",
+    "protected",
+    "static",
+    "final",
+    "abstract",
+    "synchronized",
+    "volatile",
+    "transient",
+    "native",
+    "strictfp",
+    "sealed",
+    "non-sealed",
+  ]),
   python: new Set(["import", "from", "as", "global", "nonlocal", "del"]),
   rust: new Set([
     "let",
@@ -353,32 +350,31 @@ const builtins: Record<Language, Set<string>> = {
     "Boolean",
   ]),
   java: new Set([
-      "class",
-      "interface",
-      "enum",
-      "record",
-      "extends",
-      "implements",
-      "new",
-      "this",
-      "super",
-      "instanceof",
-      "package",
-      "import",
-      "assert",
-      "yield",
-      "module",
-      "requires",
-      "exports",
-      "opens",
-      "uses",
-      "provides",
-      "to",
-      "with",
-      "transitive",
-      "var"
-    ]
-  ),
+    "class",
+    "interface",
+    "enum",
+    "record",
+    "extends",
+    "implements",
+    "new",
+    "this",
+    "super",
+    "instanceof",
+    "package",
+    "import",
+    "assert",
+    "yield",
+    "module",
+    "requires",
+    "exports",
+    "opens",
+    "uses",
+    "provides",
+    "to",
+    "with",
+    "transitive",
+    "var",
+  ]),
   python: new Set([
     "print",
     "len",
