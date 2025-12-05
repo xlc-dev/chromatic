@@ -83,14 +83,32 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build CLI binary
+      - name: Build CLI binaries
         run: bun run build:cli
 
       - name: Prepare release assets
         run: |
-          chmod +x dist/chromatic
-          tar -czf chromatic-linux-x64.tar.gz -C dist chromatic
-          sha256sum chromatic-linux-x64.tar.gz > chromatic-linux-x64.tar.gz.sha256
+          cd dist
+
+          package_binary() {
+            src=$1
+            out=$2
+            chmod +x "$src"
+            cp "$src" chromatic
+            tar -czf "../$out.tar.gz" chromatic
+            rm chromatic
+          }
+
+          package_binary "chromatic-amd64" "chromatic-linux-amd64"
+          package_binary "chromatic-amd64-musl" "chromatic-linux-amd64-musl"
+          package_binary "chromatic-arm64" "chromatic-linux-arm64"
+          package_binary "chromatic-arm64-musl" "chromatic-linux-arm64-musl"
+
+          cd ..
+
+          for archive in chromatic-linux-*.tar.gz; do
+            sha256sum "$archive" > "$archive.sha256"
+          done
 
       - name: Upload/Update "latest" release
         uses: softprops/action-gh-release@v2
@@ -99,7 +117,7 @@ jobs:
           tag_name: latest
           body: "Automated build from commit ${{ github.sha }}."
           files: |
-            chromatic-linux-x64.tar.gz
-            chromatic-linux-x64.tar.gz.sha256
+            chromatic-linux-*.tar.gz
+            chromatic-linux-*.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
