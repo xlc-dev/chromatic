@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:cli": "bun build --compile --minify --static cli.ts --outfile dist/chromatic",
+    "build:cli": "bun run build:cli:x64-glibc && bun run build:cli:x64-musl && bun run build:cli:arm64-glibc && bun run build:cli:arm64-musl",
+    "build:cli:x64-glibc": "bun build --compile --minify --target=bun-linux-x64 cli.ts --outfile dist/chromatic-x64-glibc",
+    "build:cli:x64-musl": "bun build --compile --minify --target=bun-linux-x64-musl cli.ts --outfile dist/chromatic-x64-musl",
+    "build:cli:arm64-glibc": "bun build --compile --minify --target=bun-linux-arm64 cli.ts --outfile dist/chromatic-arm64-glibc",
+    "build:cli:arm64-musl": "bun build --compile --minify --target=bun-linux-arm64-musl cli.ts --outfile dist/chromatic-arm64-musl",
     "build:all": "bun run build && bun run build:cli",
     "check": "bun run format:check && bunx tsc --noEmit",
     "preview": "vite preview",
