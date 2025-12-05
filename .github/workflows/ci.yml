@@ -5,20 +5,17 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  release:
-    types: [created]
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: read
 
 jobs:
-  lint-and-build:
+  check:
+    name: Lint and Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -31,57 +28,78 @@ jobs:
       - name: Run linting and type check
         run: bun run check
 
+  deploy-site:
+    name: Deploy Site
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
       - name: Build site
         run: bun run build
 
       - name: Upload pages artifact
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  publish-cli:
+    name: Publish CLI (Latest)
+    needs: check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
 
       - name: Build CLI binary
         run: bun run build:cli
 
-      - name: Prepare CLI binary for release
-        if: github.ref == 'refs/heads/main'
-        run: |
-          chmod +x dist/chromatic
-          cp dist/chromatic ./chromatic
-
-      - name: Upload CLI binary
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v5
-        with:
-          name: chromatic-cli
-          path: chromatic
-          retention-days: 30
-
       - name: Prepare release assets
-        if: github.event_name == 'release'
         run: |
           chmod +x dist/chromatic
           tar -czf chromatic-linux-x64.tar.gz -C dist chromatic
           sha256sum chromatic-linux-x64.tar.gz > chromatic-linux-x64.tar.gz.sha256
 
-      - name: Upload release asset
-        if: github.event_name == 'release'
+      - name: Upload/Update "latest" release
         uses: softprops/action-gh-release@v2
         with:
+          name: Latest Build (main)
+          tag_name: latest
+          body: "Automated build from commit ${{ github.sha }}."
           files: |
             chromatic-linux-x64.tar.gz
             chromatic-linux-x64.tar.gz.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy-pages:
-    needs: lint-and-build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
