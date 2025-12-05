@@ -1,5 +1,6 @@
 import typescriptCode from "./code/typescript.tsx?raw";
 import javascriptCode from "./code/javascript.js?raw";
+import javaCode from "./code/java.java?raw";
 import pythonCode from "./code/python.py?raw";
 import rustCode from "./code/rust.rs?raw";
 import goCode from "./code/go.go?raw";
@@ -12,7 +13,7 @@ export interface CodeExample {
   code: string;
 }
 
-export type Language = "typescript" | "python" | "rust" | "go" | "javascript" | "c" | "cpp" | "zig";
+export type Language = "typescript" | "python" | "rust" | "go" | "javascript" | "c" | "cpp" | "zig" | "java";
 
 const codeExamples: Record<Language, CodeExample> = {
   typescript: {
@@ -22,6 +23,10 @@ const codeExamples: Record<Language, CodeExample> = {
   javascript: {
     filename: "main.js",
     code: javascriptCode,
+  },
+  java: {
+    filename: "main.java",
+    code: javaCode,
   },
   python: {
     filename: "main.py",
