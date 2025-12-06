@@ -157,9 +157,6 @@ export function createTheme(scheme: ColorScheme) {
       "editorWarning.foreground": scheme.yellow,
       "editorInfo.foreground": scheme.blue,
       "editorHint.foreground": scheme.cyan,
-      "editorGutter.modifiedBackground": scheme.yellow,
-      "editorGutter.addedBackground": scheme.green,
-      "editorGutter.deletedBackground": scheme.red,
     },
     tokenColors: [
       {
@@ -295,19 +292,16 @@ export function createTheme(scheme: ColorScheme) {
   };
 }
 
-export function writeTheme(scheme: ColorScheme, extensionDir: string, editorName: string): void {
+export function writeTheme(scheme: ColorScheme, extensionDir: string): void {
   ensureDir(extensionDir);
 
-  // Create themes subdirectory
   const themesDir = join(extensionDir, "themes");
   ensureDir(themesDir);
 
-  // Create the theme JSON file in themes/ subdirectory
   const themePath = join(themesDir, "chromatic-color-theme.json");
   const theme = createTheme(scheme);
   writeConfigFile(themePath, JSON.stringify(theme, null, 2));
 
-  // Create package.json for the extension
   const packageJson = {
     name: "chromatic-color-theme",
     displayName: "Chromatic Color Theme",
@@ -330,16 +324,9 @@ export function writeTheme(scheme: ColorScheme, extensionDir: string, editorName
 
   const packageJsonPath = join(extensionDir, "package.json");
   writeConfigFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
-
-  console.log(`✓ Configured ${editorName}`);
-  console.log(`  Theme extension saved to: ${extensionDir}`);
-  console.log(
-    `  To use: Open ${editorName} → Preferences → Color Theme → Select "Chromatic Color Theme"`
-  );
-  console.log(`  You may need to reload ${editorName} for the theme to appear.`);
 }
 
 export function configureVSCode(scheme: ColorScheme): void {
   const extensionDir = join(homedir(), ".vscode", "extensions", "chromatic-color-theme");
-  writeTheme(scheme, extensionDir, "VSCode");
+  writeTheme(scheme, extensionDir);
 }
