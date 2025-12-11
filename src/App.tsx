@@ -11,6 +11,7 @@ import ExportJSON from "./components/ExportJSON";
 import ImportJSON from "./components/ImportJSON";
 import PresetSelector from "./components/PresetSelector";
 import Button from "./components/Button";
+import ErrorMessage from "./components/ErrorMessage";
 import { processImageFile } from "./utils/imageProcessor";
 
 const BASE_URL = import.meta.env["BASE_URL"];
@@ -37,6 +38,7 @@ const getInitialScheme = (): ColorScheme => {
 export default function App() {
   const [scheme, setScheme] = createSignal<ColorScheme>(getInitialScheme());
   const [imageExtracting, setImageExtracting] = createSignal(false);
+  const [error, setError] = createSignal<string | null>(null);
   let imageInputRef: HTMLInputElement | undefined;
 
   createEffect(() => {
@@ -48,12 +50,7 @@ export default function App() {
     }
   });
 
-  const getInitialTab = (): "preview" | "export" => {
-    const saved = localStorage.getItem("chromatic-active-tab");
-    return saved === "preview" || saved === "export" ? saved : "preview";
-  };
-
-  const [activeTab, setActiveTab] = createSignal<"preview" | "export">(getInitialTab());
+  const [activeTab, setActiveTab] = createSignal<"preview" | "export">("preview");
   let tabGroupRef: HTMLDivElement | undefined;
   let previewTabRef: HTMLButtonElement | undefined;
   let exportTabRef: HTMLButtonElement | undefined;
@@ -86,7 +83,6 @@ export default function App() {
 
   const handleTabChange = (tab: "preview" | "export") => {
     setActiveTab(tab);
-    localStorage.setItem("chromatic-active-tab", tab);
   };
 
   const handleColorChange = (key: ColorSchemeKey, value: string) => {
@@ -118,7 +114,8 @@ export default function App() {
       handleTabChange("preview");
     } catch (error) {
       console.error("Failed to extract colors from image:", error);
-      alert(error instanceof Error ? error.message : "Failed to extract colors from image.");
+      setError(error instanceof Error ? error.message : "Failed to extract colors from image.");
+      setTimeout(() => setError(null), 5000);
     } finally {
       setImageExtracting(false);
       target.value = "";
@@ -153,22 +150,24 @@ export default function App() {
             />
             <button
               ref={previewTabRef}
-              class={`bg-transparent border-0 py-2 px-4 text-[#8b949e] text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation ${
-                activeTab() === "preview"
-                  ? "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]"
-                  : "hover:text-[#c9d1d9]"
-              }`}
+              class="bg-transparent border-0 py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation"
+              classList={{
+                "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]":
+                  activeTab() === "preview",
+                "text-[#8b949e] hover:text-[#c9d1d9]": activeTab() !== "preview",
+              }}
               onClick={() => handleTabChange("preview")}
             >
               Color Palette
             </button>
             <button
               ref={exportTabRef}
-              class={`bg-transparent border-0 py-2 px-4 text-[#8b949e] text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation ${
-                activeTab() === "export"
-                  ? "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]"
-                  : "hover:text-[#c9d1d9]"
-              }`}
+              class="bg-transparent border-0 py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation"
+              classList={{
+                "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]":
+                  activeTab() === "export",
+                "text-[#8b949e] hover:text-[#c9d1d9]": activeTab() !== "export",
+              }}
               onClick={() => handleTabChange("export")}
             >
               Export
@@ -209,6 +208,11 @@ export default function App() {
           <Preview scheme={scheme()} />
         </div>
       </main>
+      {error() && (
+        <div class="fixed top-24 right-4 z-[2000] max-w-xs animate-slide-up">
+          <ErrorMessage message={error()!} />
+        </div>
+      )}
     </div>
   );
 }

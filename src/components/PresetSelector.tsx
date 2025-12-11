@@ -1,4 +1,4 @@
-import { For, createSignal, Show } from "solid-js";
+import { For, createSignal, Show, createEffect } from "solid-js";
 import { type ColorScheme } from "../types";
 import presetsData from "../data/presets.json";
 import Button from "./Button";
@@ -22,6 +22,18 @@ export default function PresetSelector(props: PresetSelectorProps) {
     props.onSelect(preset.scheme);
     setIsOpen(false);
   };
+
+  createEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen()) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen()) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  });
 
   return (
     <>

@@ -42,9 +42,11 @@ export default function ColorPicker(props: ColorPickerProps) {
   const [pickerState, setPickerState] = createSignal<PickerState | null>(null);
   const [hsv, setHsv] = createSignal({ h: 0, s: 100, v: 100 });
   const [isDragging, setIsDragging] = createSignal(false);
-  const [dragType, setDragType] = createSignal<"spectrum" | "brightness" | "hue" | null>(null);
+  const [dragType, setDragType] = createSignal<"spectrum" | "hue" | null>(null);
   const [popupVisible, setPopupVisible] = createSignal(false);
   let popupRef: HTMLDivElement | undefined;
+  let spectrumRef: HTMLDivElement | undefined;
+  let hueRef: HTMLDivElement | undefined;
 
   const calculatePopupPosition = (targetRect: DOMRect): { x: number; y: number } => {
     const gap = 10;
@@ -129,7 +131,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     updateColor({ h, s: current.s, v: current.v });
   };
 
-  const handleMouseDown = (type: "spectrum" | "brightness" | "hue") => {
+  const handleMouseDown = (type: "spectrum" | "hue") => {
     setIsDragging(true);
     setDragType(type);
   };
@@ -137,31 +139,18 @@ export default function ColorPicker(props: ColorPickerProps) {
   const handleMouseMove = (e: MouseEvent) => {
     if (!isDragging()) return;
 
-    if (dragType() === "spectrum") {
-      const spectrumEl = document.querySelector(".color-spectrum") as HTMLElement;
-      if (spectrumEl) {
-        const rect = spectrumEl.getBoundingClientRect();
-        const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-        const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
-        const current = hsv();
-        updateColor({ h: current.h, s: x * 100, v: (1 - y) * 100 });
-      }
-    } else if (dragType() === "brightness") {
-      const brightnessEl = document.querySelector(".color-brightness") as HTMLElement;
-      if (brightnessEl) {
-        const rect = brightnessEl.getBoundingClientRect();
-        const v = Math.max(0, Math.min(100, 100 - ((e.clientY - rect.top) / rect.height) * 100));
-        const current = hsv();
-        updateColor({ h: current.h, s: current.s, v });
-      }
-    } else if (dragType() === "hue") {
-      const hueEl = document.querySelector(".color-hue") as HTMLElement;
-      if (hueEl) {
-        const rect = hueEl.getBoundingClientRect();
-        const h = Math.max(0, Math.min(360, ((e.clientX - rect.left) / rect.width) * 360));
-        const current = hsv();
-        updateColor({ h, s: current.s, v: current.v });
-      }
+    const current = hsv();
+    const type = dragType();
+
+    if (type === "spectrum" && spectrumRef) {
+      const rect = spectrumRef.getBoundingClientRect();
+      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height));
+      updateColor({ h: current.h, s: x * 100, v: (1 - y) * 100 });
+    } else if (type === "hue" && hueRef) {
+      const rect = hueRef.getBoundingClientRect();
+      const h = Math.max(0, Math.min(360, ((e.clientX - rect.left) / rect.width) * 360));
+      updateColor({ h, s: current.s, v: current.v });
     }
   };
 
@@ -185,6 +174,18 @@ export default function ColorPicker(props: ColorPickerProps) {
     setPickerState(null);
     setPopupVisible(false);
   };
+
+  createEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && pickerState()) {
+        closePicker();
+      }
+    };
+    if (pickerState()) {
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
+    }
+  });
 
   const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -342,6 +343,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                         return (
                           <>
                             <div
+                              ref={spectrumRef}
                               class="color-spectrum w-[250px] h-[200px] rounded-md border border-[#30363d] cursor-crosshair relative overflow-hidden max-[640px]:w-full max-[640px]:max-w-[250px]"
                               style={{ background: getSpectrumGradient() }}
                               onClick={handleSpectrumClick}
@@ -359,6 +361,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                               />
                             </div>
                             <div
+                              ref={hueRef}
                               class="color-hue w-[250px] h-5 rounded-md border border-[#30363d] cursor-pointer relative overflow-hidden max-[640px]:w-full max-[640px]:max-w-[250px]"
                               style={{ background: getHueGradient() }}
                               onClick={handleHueClick}
