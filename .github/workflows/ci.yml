@@ -110,14 +110,16 @@ jobs:
             sha256sum "$archive" > "$archive.sha256"
           done
 
-      - name: Upload/Update "latest" release
+      - name: Create new release
         uses: softprops/action-gh-release@v2
         with:
-          name: Latest Build (main)
-          tag_name: latest
+          name: Build ${{ github.sha }}
+          tag_name: build-${{ github.sha }}
           body: "Automated build from commit ${{ github.sha }}."
           files: |
             chromatic-linux-*.tar.gz
             chromatic-linux-*.tar.gz.sha256
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
