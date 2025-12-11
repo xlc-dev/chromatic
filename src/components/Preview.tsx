@@ -1,7 +1,8 @@
 import { createSignal, For, Show, createEffect } from "solid-js";
-import type { ColorScheme } from "../types";
+import { type ColorScheme } from "../types";
 import codeExamplesData, { type Language, type CodeExample } from "../data/code";
 import { highlightSyntax, type CodeToken } from "../utils/syntaxHighlighter";
+import WindowHeader from "./WindowHeader";
 
 interface PreviewProps {
   scheme: ColorScheme;
@@ -323,35 +324,7 @@ export default function Preview(props: PreviewProps) {
           }}
           onClick={() => setActiveWindow("editor")}
         >
-          <div
-            class="bg-[rgba(13,17,23,0.9)] px-3 py-2 flex items-center gap-2 border-b border-white/10 select-none"
-            style={{
-              background: props.scheme.brightBlack,
-              "border-bottom-color": props.scheme.black,
-            }}
-          >
-            <div class="flex gap-1.5 items-center">
-              <span
-                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: props.scheme.red }}
-              ></span>
-              <span
-                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: props.scheme.yellow }}
-              ></span>
-              <span
-                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: props.scheme.green }}
-              ></span>
-            </div>
-            <div
-              class="text-xs text-[#c9d1d9] font-medium flex-1 text-center font-mono"
-              style={{ color: props.scheme.foreground }}
-            >
-              {currentExample().filename} — chromatic
-            </div>
-            <div class="w-[34px] flex-shrink-0"></div>
-          </div>
+          <WindowHeader scheme={props.scheme} title={`${currentExample().filename} — chromatic`} />
           <div
             ref={editorContentRef}
             class="flex-1 p-4 font-mono text-xs leading-relaxed overflow-y-auto overflow-x-hidden scrollbar-custom flex flex-col gap-0"
@@ -401,35 +374,7 @@ export default function Preview(props: PreviewProps) {
           }}
           onClick={() => setActiveWindow("terminal")}
         >
-          <div
-            class="bg-[rgba(13,17,23,0.9)] px-3 py-2 flex items-center gap-2 border-b border-white/10 select-none"
-            style={{
-              background: props.scheme.brightBlack,
-              "border-bottom-color": props.scheme.black,
-            }}
-          >
-            <div class="flex gap-1.5 items-center">
-              <span
-                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: props.scheme.red }}
-              ></span>
-              <span
-                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: props.scheme.yellow }}
-              ></span>
-              <span
-                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ background: props.scheme.green }}
-              ></span>
-            </div>
-            <div
-              class="text-xs text-[#c9d1d9] font-medium flex-1 text-center font-mono"
-              style={{ color: props.scheme.foreground }}
-            >
-              ~/dev/chromatic — zsh
-            </div>
-            <div class="w-[34px] flex-shrink-0"></div>
-          </div>
+          <WindowHeader scheme={props.scheme} title="~/dev/chromatic — zsh" />
           <div
             class="flex-1 p-4 font-mono text-xs leading-relaxed overflow-y-auto overflow-x-hidden scrollbar-custom flex flex-col gap-0"
             style={{

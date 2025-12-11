@@ -9,13 +9,7 @@ export interface Cluster {
   points: RGB[];
 }
 
-export function rgbToHex(r: number, g: number, b: number): string {
-  const toHex = (n: number) => {
-    const hex = Math.round(Math.max(0, Math.min(255, n))).toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
+export { rgbToHex } from "./colorUtils";
 
 export function calculateDistance(color1: RGB, color2: RGB): number {
   const dr = color1.r - color2.r;
@@ -41,15 +35,13 @@ export function kMeansClustering(pixels: RGB[], k: number, maxIterations: number
   if (k >= pixels.length) return pixels;
 
   const centroids: RGB[] = [];
-
   const firstPixel = pixels[Math.floor(Math.random() * pixels.length)];
-  if (firstPixel) {
-    centroids.push(firstPixel);
-  }
+  if (!firstPixel) return [];
+  centroids.push(firstPixel);
 
   for (let i = 1; i < k; i++) {
     let maxDist = 0;
-    let farthestPixel: RGB | undefined = pixels[0];
+    let farthestPixel: RGB = pixels[0]!;
 
     for (const pixel of pixels) {
       let minDist = Infinity;
@@ -62,9 +54,7 @@ export function kMeansClustering(pixels: RGB[], k: number, maxIterations: number
         farthestPixel = pixel;
       }
     }
-    if (farthestPixel) {
-      centroids.push(farthestPixel);
-    }
+    centroids.push(farthestPixel);
   }
 
   for (let iter = 0; iter < maxIterations; iter++) {
@@ -76,12 +66,11 @@ export function kMeansClustering(pixels: RGB[], k: number, maxIterations: number
 
       for (let i = 0; i < centroids.length; i++) {
         const centroid = centroids[i];
-        if (centroid) {
-          const dist = calculateDistance(pixel, centroid);
-          if (dist < minDist) {
-            minDist = dist;
-            nearestCluster = i;
-          }
+        if (!centroid) continue;
+        const dist = calculateDistance(pixel, centroid);
+        if (dist < minDist) {
+          minDist = dist;
+          nearestCluster = i;
         }
       }
       const cluster = clusters[nearestCluster];

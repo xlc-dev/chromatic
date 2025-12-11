@@ -1,6 +1,5 @@
-import type { ColorScheme } from "../types";
-import type { RGB } from "./colorExtraction";
-import { calculateBrightness, rgbToHex, calculateDistance } from "./colorExtraction";
+import { type ColorScheme, defaultColorScheme } from "../types";
+import { type RGB, calculateBrightness, rgbToHex, calculateDistance } from "./colorExtraction";
 
 function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
   r /= 255;
@@ -108,29 +107,7 @@ function filterSimilarColors(colors: RGB[], minDistance: number = 30): RGB[] {
 
 export function mapColorsToScheme(extractedColors: RGB[]): ColorScheme {
   if (extractedColors.length === 0) {
-    return {
-      black: "#000000",
-      red: "#cd3131",
-      green: "#0dbc79",
-      yellow: "#e5e510",
-      blue: "#2472c8",
-      magenta: "#bc3fbc",
-      cyan: "#11a8cd",
-      white: "#e5e5e5",
-      brightBlack: "#666666",
-      brightRed: "#f14c4c",
-      brightGreen: "#23d18b",
-      brightYellow: "#f5f543",
-      brightBlue: "#3b8eea",
-      brightMagenta: "#d670d6",
-      brightCyan: "#29b8db",
-      brightWhite: "#e5e5e5",
-      background: "#0c0c0c",
-      foreground: "#cccccc",
-      activeBorder: "#58a6ff",
-      inactiveBorder: "#30363d",
-      urgentBorder: "#f85149",
-    };
+    return defaultColorScheme;
   }
 
   const filteredColors = filterSimilarColors(extractedColors, 25);
@@ -142,29 +119,7 @@ export function mapColorsToScheme(extractedColors: RGB[]): ColorScheme {
   const lightest = sortedByBrightness[sortedByBrightness.length - 1];
 
   if (!darkest || !lightest) {
-    return {
-      black: "#000000",
-      red: "#cd3131",
-      green: "#0dbc79",
-      yellow: "#e5e510",
-      blue: "#2472c8",
-      magenta: "#bc3fbc",
-      cyan: "#11a8cd",
-      white: "#e5e5e5",
-      brightBlack: "#666666",
-      brightRed: "#f14c4c",
-      brightGreen: "#23d18b",
-      brightYellow: "#f5f543",
-      brightBlue: "#3b8eea",
-      brightMagenta: "#d670d6",
-      brightCyan: "#29b8db",
-      brightWhite: "#e5e5e5",
-      background: "#0c0c0c",
-      foreground: "#cccccc",
-      activeBorder: "#58a6ff",
-      inactiveBorder: "#30363d",
-      urgentBorder: "#f85149",
-    };
+    return defaultColorScheme;
   }
 
   const bgBrightness = calculateBrightness(darkest);
@@ -269,13 +224,13 @@ export function mapColorsToScheme(extractedColors: RGB[]): ColorScheme {
 
   const brightBlack =
     sortedByBrightness.length > 1
-      ? sortedByBrightness[Math.min(3, sortedByBrightness.length - 1)] ||
-        increaseLightness(black, 0.25)
+      ? (sortedByBrightness[Math.min(3, sortedByBrightness.length - 1)] ??
+        increaseLightness(black, 0.25))
       : increaseLightness(black, 0.25);
   const brightWhite =
     sortedByBrightness.length > 1
-      ? sortedByBrightness[Math.max(sortedByBrightness.length - 2, 0)] ||
-        increaseLightness(white, 0.15)
+      ? (sortedByBrightness[Math.max(sortedByBrightness.length - 2, 0)] ??
+        increaseLightness(white, 0.15))
       : increaseLightness(white, 0.15);
 
   const vibrantColors = filteredColors.filter((c) => calculateSaturation(c) > 0.3);
@@ -292,26 +247,22 @@ export function mapColorsToScheme(extractedColors: RGB[]): ColorScheme {
       ? vibrantColors[0]
       : blue.r + blue.g + blue.b > 200
         ? blue
-        : (() => {
-            const idx = Math.floor(filteredColors.length * 0.7);
-            return filteredColors[idx] || blue;
-          })();
+        : (filteredColors[Math.floor(filteredColors.length * 0.7)] ?? blue);
 
   const redColors = vibrantColors.filter(
-    (c) => c && getHueCategory(rgbToHsl(c.r, c.g, c.b).h) === "red"
+    (c) => getHueCategory(rgbToHsl(c.r, c.g, c.b).h) === "red"
   );
   const urgentBorder =
     redColors.length > 0 && redColors[0]
       ? redColors[0]
       : red.r > 150
         ? red
-        : vibrantColors[1] || red;
+        : (vibrantColors[1] ?? red);
 
   const midBrightnessIdx = Math.floor(sortedByBrightness.length * 0.4);
-  const midBrightness = sortedByBrightness[midBrightnessIdx];
   const inactiveBorderIdx = Math.floor(sortedByBrightness.length / 2);
-  const inactiveBorder = midBrightness ||
-    sortedByBrightness[inactiveBorderIdx] || { r: 128, g: 128, b: 128 };
+  const inactiveBorder = sortedByBrightness[midBrightnessIdx] ??
+    sortedByBrightness[inactiveBorderIdx] ?? { r: 128, g: 128, b: 128 };
 
   return {
     black: rgbToHex(black.r, black.g, black.b),

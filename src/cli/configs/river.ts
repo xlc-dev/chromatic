@@ -1,7 +1,7 @@
 import { join } from "path";
 import { homedir } from "os";
 import { execSync } from "child_process";
-import type { ColorScheme } from "../../types";
+import { type ColorScheme } from "../../types";
 import { updateConfigFile, hexToRiverFormat, type ConfigUpdate } from "../utils";
 
 export function configureRiver(scheme: ColorScheme): void {

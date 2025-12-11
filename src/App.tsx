@@ -1,14 +1,17 @@
 import { createSignal, createEffect, onMount } from "solid-js";
-import type { ColorScheme, ColorSchemeKey } from "./types";
-import { defaultColorScheme, COLOR_SCHEME_KEYS } from "./types";
+import {
+  type ColorScheme,
+  type ColorSchemeKey,
+  defaultColorScheme,
+  COLOR_SCHEME_KEYS,
+} from "./types";
 import ColorPicker from "./components/ColorPicker";
 import Preview from "./components/Preview";
 import ExportJSON from "./components/ExportJSON";
 import ImportJSON from "./components/ImportJSON";
-import ConfirmDialog from "./components/ConfirmDialog";
 import PresetSelector from "./components/PresetSelector";
+import Button from "./components/Button";
 import { processImageFile } from "./utils/imageProcessor";
-import { shouldSkipConfirmation } from "./utils/confirmation";
 
 const BASE_URL = import.meta.env["BASE_URL"];
 const faviconUrl = `${BASE_URL}favicon.svg`;
@@ -33,8 +36,6 @@ const getInitialScheme = (): ColorScheme => {
 
 export default function App() {
   const [scheme, setScheme] = createSignal<ColorScheme>(getInitialScheme());
-  const [showResetDialog, setShowResetDialog] = createSignal(false);
-  const [showImageExtractDialog, setShowImageExtractDialog] = createSignal(false);
   const [imageExtracting, setImageExtracting] = createSignal(false);
   let imageInputRef: HTMLInputElement | undefined;
 
@@ -64,26 +65,17 @@ export default function App() {
     const buttonRect = activeButton.getBoundingClientRect();
     const groupRect = tabGroupRef.getBoundingClientRect();
 
+    const left = buttonRect.left - groupRect.left;
     const width = buttonRect.width;
-    let left = buttonRect.left - groupRect.left;
+    const padding = 4;
 
-    const groupStyle = window.getComputedStyle(tabGroupRef);
-    const paddingLeft = parseFloat(groupStyle.paddingLeft) || 4;
-    const paddingRight = parseFloat(groupStyle.paddingRight) || 4;
-
-    left = Math.max(paddingLeft, left);
-    const maxWidth = groupRect.width - left - paddingRight;
-    const clampedWidth = Math.min(width, maxWidth);
-
-    tabGroupRef.style.setProperty("--indicator-width", `${clampedWidth}px`);
-    tabGroupRef.style.setProperty("--indicator-left", `${left}px`);
+    tabGroupRef.style.setProperty("--indicator-width", `${width}px`);
+    tabGroupRef.style.setProperty("--indicator-left", `${Math.max(padding, left)}px`);
   };
 
   createEffect(() => {
     activeTab();
-    requestAnimationFrame(() => {
-      requestAnimationFrame(updateTabIndicator);
-    });
+    requestAnimationFrame(updateTabIndicator);
   });
 
   onMount(() => {
@@ -102,16 +94,7 @@ export default function App() {
   };
 
   const handleResetClick = () => {
-    if (shouldSkipConfirmation("reset")) {
-      setScheme(defaultColorScheme);
-    } else {
-      setShowResetDialog(true);
-    }
-  };
-
-  const handleResetConfirm = () => {
     setScheme(defaultColorScheme);
-    setShowResetDialog(false);
   };
 
   const handleImport = (importedScheme: ColorScheme) => {
@@ -120,20 +103,7 @@ export default function App() {
   };
 
   const handleImageExtractClick = () => {
-    if (shouldSkipConfirmation("image")) {
-      if (imageInputRef) {
-        imageInputRef.click();
-      }
-    } else {
-      setShowImageExtractDialog(true);
-    }
-  };
-
-  const handleImageExtractConfirm = () => {
-    setShowImageExtractDialog(false);
-    if (imageInputRef) {
-      imageInputRef.click();
-    }
+    imageInputRef?.click();
   };
 
   const handleImageFileSelected = async (event: Event) => {
@@ -151,9 +121,7 @@ export default function App() {
       alert(error instanceof Error ? error.message : "Failed to extract colors from image.");
     } finally {
       setImageExtracting(false);
-      if (target) {
-        target.value = "";
-      }
+      target.value = "";
     }
   };
 
@@ -181,7 +149,6 @@ export default function App() {
               style={{
                 left: "var(--indicator-left, 0.25rem)",
                 width: "var(--indicator-width, 100px)",
-                "max-width": "calc(100% - 0.5rem)",
               }}
             />
             <button
@@ -209,15 +176,9 @@ export default function App() {
           </div>
           <div class="flex gap-4 items-center max-[640px]:order-3 max-[640px]:w-full max-[640px]:justify-center">
             <PresetSelector onSelect={setScheme} />
-            <button
-              onClick={handleImageExtractClick}
-              class={`bg-[#21262d] rounded px-4 py-2 cursor-pointer text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative overflow-hidden border border-[#30363d] text-[#c9d1d9] before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(200,209,217,0.1)] before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:bg-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${
-                imageExtracting() ? "cursor-not-allowed opacity-60" : ""
-              }`}
-              disabled={imageExtracting()}
-            >
+            <Button onClick={handleImageExtractClick} disabled={imageExtracting()}>
               {imageExtracting() ? "Extracting..." : "Extract from Image"}
-            </button>
+            </Button>
             <input
               ref={imageInputRef}
               id="image-extract-input"
@@ -227,12 +188,7 @@ export default function App() {
               disabled={imageExtracting()}
               style="display: none;"
             />
-            <button
-              onClick={handleResetClick}
-              class="bg-[#21262d] rounded px-4 py-2 cursor-pointer text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative overflow-hidden border border-[#30363d] text-[#c9d1d9] before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(200,209,217,0.1)] before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:bg-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] hover:-translate-y-0.5"
-            >
-              Reset to Default
-            </button>
+            <Button onClick={handleResetClick}>Reset to Default</Button>
           </div>
         </div>
       </header>
@@ -253,26 +209,6 @@ export default function App() {
           <Preview scheme={scheme()} />
         </div>
       </main>
-      <ConfirmDialog
-        open={showResetDialog()}
-        title="Reset Colorscheme"
-        message="Are you sure you want to reset all colors to default? This will discard all your changes."
-        confirmText="Reset"
-        cancelText="Cancel"
-        storageKey="reset"
-        onConfirm={handleResetConfirm}
-        onCancel={() => setShowResetDialog(false)}
-      />
-      <ConfirmDialog
-        open={showImageExtractDialog()}
-        title="Extract Colors from Image"
-        message="This will replace your current colorscheme with colors extracted from the image. All your current changes will be lost."
-        confirmText="Continue"
-        cancelText="Cancel"
-        storageKey="image"
-        onConfirm={handleImageExtractConfirm}
-        onCancel={() => setShowImageExtractDialog(false)}
-      />
     </div>
   );
 }

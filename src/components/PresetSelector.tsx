@@ -1,8 +1,8 @@
 import { For, createSignal, Show } from "solid-js";
-import type { ColorScheme } from "../types";
+import { type ColorScheme } from "../types";
 import presetsData from "../data/presets.json";
-import ConfirmDialog from "./ConfirmDialog";
-import { shouldSkipConfirmation } from "../utils/confirmation";
+import Button from "./Button";
+import ColorPalettePreview from "./ColorPalettePreview";
 
 interface Preset {
   name: string;
@@ -16,39 +16,16 @@ interface PresetSelectorProps {
 
 export default function PresetSelector(props: PresetSelectorProps) {
   const [isOpen, setIsOpen] = createSignal(false);
-  const [pendingPreset, setPendingPreset] = createSignal<Preset | null>(null);
   const presets = presetsData as Preset[];
 
   const handleSelect = (preset: Preset) => {
-    if (shouldSkipConfirmation("preset")) {
-      props.onSelect(preset.scheme);
-      setIsOpen(false);
-    } else {
-      setPendingPreset(preset);
-    }
-  };
-
-  const handleConfirm = () => {
-    const preset = pendingPreset();
-    if (preset) {
-      props.onSelect(preset.scheme);
-      setPendingPreset(null);
-      setIsOpen(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setPendingPreset(null);
+    props.onSelect(preset.scheme);
+    setIsOpen(false);
   };
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(true)}
-        class="bg-[#21262d] rounded px-4 py-2 cursor-pointer text-sm font-medium transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative overflow-hidden border border-[#30363d] text-[#c9d1d9] before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(200,209,217,0.1)] before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:bg-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] hover:-translate-y-0.5"
-      >
-        Presets
-      </button>
+      <Button onClick={() => setIsOpen(true)}>Presets</Button>
 
       <Show when={isOpen()}>
         <div
@@ -85,82 +62,7 @@ export default function PresetSelector(props: PresetSelectorProps) {
                         </h3>
                         <p class="text-xs text-[#8b949e] m-0 leading-snug">{preset.description}</p>
                       </div>
-                      <div class="mt-3">
-                        <div class="grid grid-cols-8 gap-0.5">
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.black,
-                            }}
-                            title="Black"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.red,
-                            }}
-                            title="Red"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.green,
-                            }}
-                            title="Green"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.yellow,
-                            }}
-                            title="Yellow"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.blue,
-                            }}
-                            title="Blue"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.magenta,
-                            }}
-                            title="Magenta"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.cyan,
-                            }}
-                            title="Cyan"
-                          />
-                          <div
-                            class="aspect-square rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.white,
-                            }}
-                            title="White"
-                          />
-                        </div>
-                        <div class="grid grid-cols-2 gap-0.5 mt-0.5">
-                          <div
-                            class="aspect-[2/1] rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.background,
-                            }}
-                            title="Background"
-                          />
-                          <div
-                            class="aspect-[2/1] rounded-sm border border-white/10"
-                            style={{
-                              "background-color": preset.scheme.foreground,
-                            }}
-                            title="Foreground"
-                          />
-                        </div>
-                      </div>
+                      <ColorPalettePreview scheme={preset.scheme} />
                     </div>
                   )}
                 </For>
@@ -169,16 +71,6 @@ export default function PresetSelector(props: PresetSelectorProps) {
           </div>
         </div>
       </Show>
-      <ConfirmDialog
-        open={pendingPreset() !== null}
-        title="Apply Preset"
-        message={`This will replace your current colorscheme with "${pendingPreset()?.name}". All your current changes will be lost.`}
-        confirmText="Apply"
-        cancelText="Cancel"
-        storageKey="preset"
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
-      />
     </>
   );
 }

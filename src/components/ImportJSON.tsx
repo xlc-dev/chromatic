@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
-import type { ColorScheme } from "../types";
-import { COLOR_SCHEME_KEYS } from "../types";
+import { type ColorScheme, COLOR_SCHEME_KEYS } from "../types";
+import Button from "./Button";
+import Divider from "./Divider";
 
 interface ImportJSONProps {
   onImport: (scheme: ColorScheme) => void;
@@ -20,58 +21,49 @@ export default function ImportJSON(props: ImportJSONProps) {
   const [success, setSuccess] = createSignal(false);
   const [jsonText, setJsonText] = createSignal("");
 
+  const processJson = (text: string): boolean => {
+    setError(null);
+    setSuccess(false);
+
+    try {
+      const parsed = JSON.parse(text);
+
+      if (validateColorScheme(parsed)) {
+        props.onImport(parsed);
+        setSuccess(true);
+        setJsonText("");
+        setTimeout(() => setSuccess(false), 2000);
+        return true;
+      } else {
+        setError("Invalid colorscheme format. Missing required color fields.");
+        return false;
+      }
+    } catch (e) {
+      setError("Failed to parse JSON. Please ensure it's valid JSON.");
+      return false;
+    }
+  };
+
   const handleFileUpload = async (event: Event) => {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
     if (!file) return;
 
-    setError(null);
-    setSuccess(false);
-
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text);
-
-      if (validateColorScheme(parsed)) {
-        props.onImport(parsed);
-        setSuccess(true);
-        setJsonText("");
-        setTimeout(() => setSuccess(false), 2000);
-        target.value = "";
-      } else {
-        setError("Invalid colorscheme format. Missing required color fields.");
-        target.value = "";
-      }
-    } catch (e) {
-      setError("Failed to parse JSON file. Please ensure it's valid JSON.");
+      processJson(text);
+    } finally {
       target.value = "";
     }
   };
 
   const handlePaste = () => {
-    setError(null);
-    setSuccess(false);
-
-    try {
-      const text = jsonText().trim();
-      if (!text) {
-        setError("Please paste JSON content first.");
-        return;
-      }
-
-      const parsed = JSON.parse(text);
-
-      if (validateColorScheme(parsed)) {
-        props.onImport(parsed);
-        setSuccess(true);
-        setJsonText("");
-        setTimeout(() => setSuccess(false), 2000);
-      } else {
-        setError("Invalid colorscheme format. Missing required color fields.");
-      }
-    } catch (e) {
-      setError("Failed to parse JSON. Please ensure it's valid JSON.");
+    const text = jsonText().trim();
+    if (!text) {
+      setError("Please paste JSON content first.");
+      return;
     }
+    processJson(text);
   };
 
   const handleTextChange = (value: string) => {
@@ -103,9 +95,7 @@ export default function ImportJSON(props: ImportJSONProps) {
         </label>
       </div>
 
-      <div class="flex items-center text-center my-8 text-[#8b949e] text-xs before:content-[''] before:flex-1 before:border-b before:border-[#30363d] after:content-[''] after:flex-1 after:border-b after:border-[#30363d]">
-        <span class="px-4">or</span>
-      </div>
+      <Divider />
 
       <div class="flex flex-col gap-4">
         <label for="json-paste" class="text-[#c9d1d9] text-sm font-medium">
@@ -118,16 +108,13 @@ export default function ImportJSON(props: ImportJSONProps) {
           value={jsonText()}
           onInput={(e) => handleTextChange(e.currentTarget.value)}
         />
-        <button
+        <Button
           onClick={handlePaste}
-          class={`bg-[#21262d] text-[#c9d1d9] border border-[#30363d] rounded px-4 py-3 cursor-pointer text-xs font-medium transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(200,209,217,0.1)] before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:bg-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] hover:-translate-y-0.5 ${
-            success()
-              ? "bg-[#58a6ff] text-white border-[#58a6ff] hover:bg-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_20px_rgba(88,166,255,0.4),0_4px_12px_rgba(88,166,255,0.2)]"
-              : ""
-          }`}
+          variant={success() ? "success" : "default"}
+          class="text-xs py-3"
         >
           {success() ? "Imported!" : "Import from Text"}
-        </button>
+        </Button>
       </div>
 
       {error() && (

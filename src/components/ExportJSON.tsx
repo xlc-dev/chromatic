@@ -1,5 +1,7 @@
 import { createSignal } from "solid-js";
-import type { ColorScheme } from "../types";
+import { type ColorScheme } from "../types";
+import Button from "./Button";
+import Divider from "./Divider";
 
 interface ExportJSONProps {
   scheme: ColorScheme;
@@ -22,17 +24,19 @@ export default function ExportJSON(props: ExportJSONProps) {
     URL.revokeObjectURL(url);
   };
 
-  const handleCopy = async () => {
-    const json = JSON.stringify(props.scheme, null, 2);
-    await navigator.clipboard.writeText(json);
-    setCopiedJson(true);
-    setTimeout(() => setCopiedJson(false), 1200);
+  const copyToClipboard = async (text: string, setCopied: (value: boolean) => void) => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
   };
 
-  const handleCopyCommand = async () => {
-    await navigator.clipboard.writeText("chromatic colorscheme.json --all");
-    setCopiedCommand(true);
-    setTimeout(() => setCopiedCommand(false), 1200);
+  const handleCopy = () => {
+    const json = JSON.stringify(props.scheme, null, 2);
+    copyToClipboard(json, setCopiedJson);
+  };
+
+  const handleCopyCommand = () => {
+    copyToClipboard("chromatic colorscheme.json --all", setCopiedCommand);
   };
 
   return (
@@ -43,26 +47,18 @@ export default function ExportJSON(props: ExportJSONProps) {
         applications automatically.
       </p>
       <div class="flex gap-4 mb-8 max-[640px]:flex-col">
-        <button
-          onClick={handleExport}
-          class="flex-1 bg-[#21262d] text-[#c9d1d9] border border-[#30363d] rounded px-4 py-3 cursor-pointer text-xs font-medium transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(200,209,217,0.1)] before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:bg-[#30363d] hover:text-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] hover:-translate-y-0.5"
-        >
+        <Button onClick={handleExport} class="flex-1 text-xs py-3">
           Download JSON
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleCopy}
-          class={`flex-1 bg-[#21262d] text-[#c9d1d9] border border-[#30363d] rounded px-4 py-3 cursor-pointer text-xs font-medium transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative overflow-hidden before:content-[''] before:absolute before:top-0 before:left-[-100%] before:w-full before:h-full before:bg-gradient-to-r before:from-transparent before:via-[rgba(200,209,217,0.1)] before:to-transparent before:transition-[left] before:duration-500 hover:before:left-full hover:bg-[#30363d] hover:border-[#58a6ff] hover:shadow-[0_0_15px_rgba(88,166,255,0.2)] hover:-translate-y-0.5 ${
-            copiedJson()
-              ? "bg-[#58a6ff] text-white border-[#58a6ff] hover:bg-[#58a6ff] hover:border-[#58a6ff] hover:shadow-[0_0_20px_rgba(88,166,255,0.4),0_4px_12px_rgba(88,166,255,0.2)]"
-              : ""
-          }`}
+          variant={copiedJson() ? "success" : "default"}
+          class="flex-1 text-xs py-3"
         >
           {copiedJson() ? "Copied!" : "Copy JSON"}
-        </button>
+        </Button>
       </div>
-      <div class="flex items-center text-center my-8 text-[#8b949e] text-xs before:content-[''] before:flex-1 before:border-b before:border-[#30363d] after:content-[''] after:flex-1 after:border-b after:border-[#30363d]">
-        <span class="px-4">or</span>
-      </div>
+      <Divider />
       <div>
         <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Chromatic CLI</h2>
         <p class="text-[#8b949e] text-xs mb-4 leading-relaxed">
@@ -82,17 +78,13 @@ export default function ExportJSON(props: ExportJSONProps) {
           <code class="text-[#58a6ff] font-mono text-sm flex-1">
             chromatic colorscheme.json --all
           </code>
-          <button
+          <Button
             onClick={handleCopyCommand}
-            class={`bg-[#21262d] text-[#c9d1d9] border border-[#30363d] rounded px-3 py-1.5 cursor-pointer text-xs font-medium transition-all duration-200 font-mono hover:bg-[#30363d] hover:border-[#58a6ff] hover:text-[#58a6ff] ${
-              copiedCommand()
-                ? "bg-[#58a6ff] text-white border-[#58a6ff] hover:bg-[#58a6ff] hover:border-[#58a6ff]"
-                : ""
-            }`}
-            title="Copy command"
+            variant={copiedCommand() ? "success" : "default"}
+            class="text-xs py-1.5 px-3 font-mono"
           >
             {copiedCommand() ? "Copied!" : "Copy"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
