@@ -5,20 +5,13 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:cli":
-      "bun run build:cli:x64-glibc && bun run build:cli:x64-musl && bun run build:cli:arm64-glibc && bun run build:cli:arm64-musl && bun run build:cli:macos-x64 && bun run build:cli:macos-arm64",
-    "build:cli:x64-glibc":
-      "bun build --compile --minify --target=bun-linux-x64 src/cli/cli.ts --outfile dist/chromatic-x64-glibc",
-    "build:cli:x64-musl":
-      "bun build --compile --minify --target=bun-linux-x64-musl src/cli/cli.ts --outfile dist/chromatic-x64-musl",
-    "build:cli:arm64-glibc":
-      "bun build --compile --minify --target=bun-linux-arm64 src/cli/cli.ts --outfile dist/chromatic-arm64-glibc",
-    "build:cli:arm64-musl":
-      "bun build --compile --minify --target=bun-linux-arm64-musl src/cli/cli.ts --outfile dist/chromatic-arm64-musl",
-    "build:cli:macos-x64":
-      "bun build --compile --minify --target=bun-macos-x64 src/cli/cli.ts --outfile dist/chromatic-macos-x64",
-    "build:cli:macos-arm64":
-      "bun build --compile --minify --target=bun-macos-arm64 src/cli/cli.ts --outfile dist/chromatic-macos-arm64",
+    "build:cli": "bun run build:cli:x64-glibc && bun run build:cli:x64-musl && bun run build:cli:arm64-glibc && bun run build:cli:arm64-musl && bun run build:cli:macos-x64 && bun run build:cli:macos-arm64",
+    "build:cli:x64-glibc": "bun build --compile --minify --target=bun-linux-x64 src/cli/cli.ts --outfile dist/chromatic-x64-glibc",
+    "build:cli:x64-musl": "bun build --compile --minify --target=bun-linux-x64-musl src/cli/cli.ts --outfile dist/chromatic-x64-musl",
+    "build:cli:arm64-glibc": "bun build --compile --minify --target=bun-linux-arm64 src/cli/cli.ts --outfile dist/chromatic-arm64-glibc",
+    "build:cli:arm64-musl": "bun build --compile --minify --target=bun-linux-arm64-musl src/cli/cli.ts --outfile dist/chromatic-arm64-musl",
+    "build:cli:macos-x64": "bun build --compile --minify --target=bun-macos-x64 src/cli/cli.ts --outfile dist/chromatic-macos-x64",
+    "build:cli:macos-arm64": "bun build --compile --minify --target=bun-macos-arm64 src/cli/cli.ts --outfile dist/chromatic-macos-arm64",
     "build:all": "bun run build && bun run build:cli",
     "check": "bun run format:check && bunx tsc --noEmit",
     "preview": "vite preview",
