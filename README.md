@@ -7,12 +7,12 @@
 <h1 align="center">Chromatic</h1>
 
 <p align="center" style="font-size: 1.2em; color: #586069;">
-  Finally a normal colorscheme generator for Linux.
+  Finally a normal colorscheme generator for your applications. 
 </p>
 
 ---
 
-Chromatic is a modern, web-based colorscheme generator designed specifically for Linux users. Create, customize, and export colorschemes for your terminal, window manager, and other applications with an intuitive visual interface.
+Chromatic is a modern, web-based colorscheme generator. Create, customize, and export colorschemes for your terminal, window manager, and other applications with an intuitive visual interface.
 
 ## Features
 
