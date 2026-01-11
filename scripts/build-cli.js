@@ -5,8 +5,9 @@ const packageJson = JSON.parse(readFileSync("package.json", "utf-8"));
 const scripts = packageJson.scripts || {};
 
 // Find all build:cli:* scripts (excluding build:cli itself)
-const cliBuildKeys = Object.keys(scripts)
-  .filter((key) => key.startsWith("build:cli:") && key !== "build:cli");
+const cliBuildKeys = Object.keys(scripts).filter(
+  (key) => key.startsWith("build:cli:") && key !== "build:cli"
+);
 
 if (cliBuildKeys.length === 0) {
   console.error("No build:cli:* scripts found in package.json");
