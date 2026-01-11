@@ -87,39 +87,19 @@ jobs:
         run: bun run build:cli
 
       - name: Prepare release assets
-        run: |
-          cd dist
-
-          package_binary() {
-            src=$1
-            out=$2
-            chmod +x "$src"
-            cp "$src" chromatic
-            tar -czf "../$out.tar.gz" chromatic
-            rm chromatic
-          }
-
-          package_binary "chromatic-x64-glibc" "chromatic-linux-amd64"
-          package_binary "chromatic-x64-musl" "chromatic-linux-amd64-musl"
-          package_binary "chromatic-arm64-glibc" "chromatic-linux-arm64"
-          package_binary "chromatic-arm64-musl" "chromatic-linux-arm64-musl"
-
-          cd ..
-
-          for archive in chromatic-linux-*.tar.gz; do
-            sha256sum "$archive" > "$archive.sha256"
-          done
+        run: bun scripts/package-cli.js | sh -e
 
       - name: Create new release
         uses: softprops/action-gh-release@v2
         with:
           name: Build ${{ github.run_number }}
-          tag_name: build-${{ github.run_number }}
+          tag_name: build-${{ github.run_number }}-${{ github.sha }}
           body: "Automated build #${{ github.run_number }} from commit ${{ github.sha }}."
           files: |
-            chromatic-linux-*.tar.gz
-            chromatic-linux-*.tar.gz.sha256
+            release/chromatic-*
+            release/chromatic-*.sha256
           draft: false
           prerelease: false
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
