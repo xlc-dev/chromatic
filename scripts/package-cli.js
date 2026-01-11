@@ -54,34 +54,19 @@ console.log("cd dist");
 console.log("");
 console.log("mkdir -p ../release");
 console.log("");
-console.log("package_binary() {");
-console.log('  src="$1"');
-console.log('  out="$2"');
-console.log('  chmod +x "$src"');
-console.log("  # Copy binary directly");
-console.log('  cp "$src" "../release/$out"');
-console.log("  # Also create tarball");
-console.log('  cp "$src" chromatic');
-console.log('  tar -czf "../release/$out.tar.gz" chromatic');
-console.log("  rm -f chromatic");
-console.log("}");
-console.log("");
-
 cliBuilds.forEach(({ binaryName, releaseName }) => {
-  console.log(`package_binary "${binaryName}" "chromatic-${releaseName}"`);
+  console.log(`chmod +x "${binaryName}"`);
+  console.log(`cp "${binaryName}" "../release/chromatic-${releaseName}"`);
 });
 
 console.log("");
 console.log("cd ../release");
 console.log("");
-console.log("# Create checksums for all files (binaries and tarballs)");
-console.log("for file in chromatic-*; do");
-console.log('  case "$file" in');
-console.log("    *.sha256) ;;");
-console.log("    *)");
-console.log('      if [ -f "$file" ]; then');
-console.log('        sha256sum "$file" > "$file.sha256"');
-console.log("      fi");
-console.log("      ;;");
-console.log("  esac");
-console.log("done");
+cliBuilds.forEach(({ releaseName }) => {
+  console.log(`sha256sum "chromatic-${releaseName}" > "chromatic-${releaseName}.sha256"`);
+});
+console.log("");
+const binaryFiles = cliBuilds.map(({ releaseName }) => `chromatic-${releaseName}`).join(" ");
+console.log(`tar -czf chromatic-all.tar.gz ${binaryFiles}`);
+console.log("");
+console.log("sha256sum chromatic-all.tar.gz > chromatic-all.tar.gz.sha256");
