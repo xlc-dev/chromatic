@@ -89,16 +89,21 @@ jobs:
       - name: Prepare release assets
         run: bun scripts/package-cli.js | sh -e
 
+      - name: Generate release file list
+        id: release_files
+        run: |
+          FILES=$(bun scripts/list-release-files.js)
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create new release
         uses: softprops/action-gh-release@v2
         with:
           name: Build ${{ github.run_number }}
           tag_name: build-${{ github.run_number }}-${{ github.sha }}
           body: "Automated build #${{ github.run_number }} from commit ${{ github.sha }}"
-          files: |
-            release/chromatic-all.tar.gz
-            release/chromatic-all.tar.gz.sha256
-            release/chromatic-*.sha256
+          files: ${{ steps.release_files.outputs.files }}
           draft: false
           prerelease: false
           make_latest: true
