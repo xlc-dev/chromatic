@@ -415,31 +415,37 @@ function tokenizeString(
   code: string,
   start: number,
   quote: string
-): { token: CodeToken; end: number } {
-  let text = quote;
+): { tokens: CodeToken[]; end: number } {
+  const tokens: CodeToken[] = [];
+  tokens.push({ text: quote, color: "green" });
   let i = start + 1;
-  let escaped = false;
 
   while (i < code.length) {
     const char = code[i];
-    text += char;
-
-    if (escaped) {
-      escaped = false;
-    } else if (char === "\\") {
-      escaped = true;
-    } else if (char === quote) {
+    if (char === quote) {
+      tokens.push({ text: quote, color: "green" });
       i++;
-      break;
+      return { tokens, end: i };
     }
-
-    i++;
+    if (char === "\\" && i + 1 < code.length) {
+      const next = code[i + 1];
+      tokens.push({ text: "\\" + next, color: "cyan" });
+      i += 2;
+      continue;
+    }
+    let text = "";
+    while (i < code.length) {
+      const c = code[i];
+      if (!c || c === quote || c === "\\") break;
+      text += c;
+      i++;
+    }
+    if (text) {
+      tokens.push({ text, color: "green" });
+    }
   }
 
-  return {
-    token: { text, color: "brightGreen" },
-    end: i,
-  };
+  return { tokens, end: i };
 }
 
 function tokenizeNumber(code: string, start: number): { token: CodeToken; end: number } {
@@ -476,7 +482,7 @@ function tokenizeNumber(code: string, start: number): { token: CodeToken; end: n
   }
 
   return {
-    token: { text, color: "yellow" },
+    token: { text, color: "magenta" },
     end: i,
   };
 }
@@ -542,18 +548,18 @@ function tokenizeIdentifier(
     i++;
   }
 
-  let color: ColorSchemeKey = "white";
+  let color: ColorSchemeKey = "foreground";
 
   if (controlFlowKeywords[lang].has(text)) {
-    color = "blue";
+    color = "magenta";
   } else if (typeKeywords[lang].has(text)) {
-    color = "brightBlue";
+    color = "yellow";
   } else if (modifierKeywords[lang].has(text)) {
     color = "magenta";
   } else if (literalKeywords[lang].has(text)) {
-    color = "brightMagenta";
+    color = "magenta";
   } else if (builtins[lang].has(text)) {
-    color = "brightCyan";
+    color = "blue";
   } else {
     const firstChar = text[0];
     if (firstChar && firstChar === firstChar.toUpperCase() && isAlpha(firstChar)) {
@@ -561,12 +567,12 @@ function tokenizeIdentifier(
     } else if (i < code.length) {
       const nextChar = code[i];
       if (nextChar === "(") {
-        color = "brightYellow";
+        color = "blue";
       } else if (text.startsWith("_") || text === text.toUpperCase()) {
-        color = "brightGreen";
+        color = "foreground";
       }
     } else if (text.startsWith("_") || text === text.toUpperCase()) {
-      color = "brightGreen";
+      color = "foreground";
     }
   }
 
@@ -586,12 +592,12 @@ function tokenizeJSXTag(
 
   const tokens: CodeToken[] = [];
   let i = start;
-  tokens.push({ text: "<", color: "white" });
+  tokens.push({ text: "<", color: "foreground" });
   i++;
 
   const nextChar = code[i];
   if (nextChar === "/") {
-    tokens.push({ text: "/", color: "white" });
+    tokens.push({ text: "/", color: "foreground" });
     i++;
   }
 
@@ -604,14 +610,14 @@ function tokenizeJSXTag(
   }
 
   if (tagName) {
-    tokens.push({ text: tagName, color: "brightMagenta" });
+    tokens.push({ text: tagName, color: "red" });
   }
 
   while (i < code.length) {
     const char = code[i];
     if (!char || char === ">") break;
     if (isWhitespace(char)) {
-      tokens.push({ text: char, color: "white" });
+      tokens.push({ text: char, color: "foreground" });
       i++;
     } else if (isAlpha(char)) {
       let attrName = "";
@@ -621,19 +627,19 @@ function tokenizeJSXTag(
         attrName += attrChar;
         i++;
       }
-      tokens.push({ text: attrName, color: "cyan" });
+      tokens.push({ text: attrName, color: "yellow" });
 
       const eqChar = code[i];
       if (eqChar === "=") {
-        tokens.push({ text: "=", color: "white" });
+        tokens.push({ text: "=", color: "foreground" });
         i++;
         const valueChar = code[i];
         if (valueChar && (valueChar === '"' || valueChar === "'")) {
           const strResult = tokenizeString(code, i, valueChar);
-          tokens.push(strResult.token);
+          tokens.push(...strResult.tokens);
           i = strResult.end;
         } else if (valueChar === "{") {
-          tokens.push({ text: "{", color: "white" });
+          tokens.push({ text: "{", color: "foreground" });
           i++;
           let braceDepth = 1;
           while (i < code.length && braceDepth > 0) {
@@ -641,20 +647,20 @@ function tokenizeJSXTag(
             if (!braceChar) break;
             if (braceChar === "{") braceDepth++;
             else if (braceChar === "}") braceDepth--;
-            tokens.push({ text: braceChar, color: "white" });
+            tokens.push({ text: braceChar, color: "foreground" });
             i++;
           }
         }
       }
     } else {
-      tokens.push({ text: char, color: "white" });
+      tokens.push({ text: char, color: "foreground" });
       i++;
     }
   }
 
   const endChar = code[i];
   if (endChar === ">") {
-    tokens.push({ text: ">", color: "white" });
+    tokens.push({ text: ">", color: "foreground" });
     i++;
   }
 
@@ -665,13 +671,13 @@ function tokenizeOperator(code: string, start: number): { token: CodeToken; end:
   const char = code[start];
   if (!char) {
     return {
-      token: { text: "", color: "white" },
+      token: { text: "", color: "foreground" },
       end: start,
     };
   }
   let text = char;
   let i = start + 1;
-  let color: ColorSchemeKey = "white";
+  let color: ColorSchemeKey = "foreground";
 
   if (start + 1 < code.length) {
     const twoChars = code.slice(start, start + 2);
@@ -685,7 +691,6 @@ function tokenizeOperator(code: string, start: number): { token: CodeToken; end:
     ) {
       text = twoChars;
       i = start + 2;
-      color = "brightRed";
     } else if (
       twoChars === "++" ||
       twoChars === "--" ||
@@ -696,43 +701,18 @@ function tokenizeOperator(code: string, start: number): { token: CodeToken; end:
     ) {
       text = twoChars;
       i = start + 2;
-      color = "cyan";
     } else if (twoChars === "=>" || twoChars === "::" || twoChars === "->") {
       text = twoChars;
       i = start + 2;
-      color = "brightCyan";
     } else if (start + 2 < code.length) {
       const threeChars = code.slice(start, start + 3);
       if (threeChars === "===" || threeChars === "!==") {
         text = threeChars;
         i = start + 3;
-        color = "brightRed";
       } else if (threeChars === "<<=" || threeChars === ">>=") {
         text = threeChars;
         i = start + 3;
-        color = "cyan";
       }
-    }
-  }
-
-  if (color === "white") {
-    if (char === "+" || char === "-" || char === "*" || char === "/" || char === "%") {
-      color = "cyan";
-    } else if (char === "=" || char === "!" || char === "<" || char === ">") {
-      color = "brightRed";
-    } else if (char === "&" || char === "|" || char === "^") {
-      color = "brightCyan";
-    } else if (char === "." || char === "," || char === ";" || char === ":") {
-      color = "brightWhite";
-    } else if (
-      char === "(" ||
-      char === ")" ||
-      char === "[" ||
-      char === "]" ||
-      char === "{" ||
-      char === "}"
-    ) {
-      color = "brightWhite";
     }
   }
 
@@ -752,7 +732,7 @@ export function highlightSyntax(code: string, language: Language): CodeToken[] {
     if (!char) break;
 
     if (isWhitespace(char)) {
-      tokens.push({ text: char, color: "white" });
+      tokens.push({ text: char, color: "foreground" });
       i++;
       continue;
     }
@@ -778,7 +758,7 @@ export function highlightSyntax(code: string, language: Language): CodeToken[] {
 
     if (char === '"' || char === "'" || char === "`") {
       const result = tokenizeString(code, i, char);
-      tokens.push(result.token);
+      tokens.push(...result.tokens);
       i = result.end;
       continue;
     }

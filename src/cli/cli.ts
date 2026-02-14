@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { createInterface } from "readline";
 import type { ColorScheme } from "../types";
 
@@ -17,6 +17,9 @@ interface Config {
     i3?: boolean;
     sway?: boolean;
     river?: boolean;
+    // GTK
+    gtk3?: boolean;
+    gtk4?: boolean;
   };
 }
 
@@ -35,6 +38,10 @@ import { configureXresources } from "./configs/xresources";
 import { configureI3 } from "./configs/i3";
 import { configureSway } from "./configs/sway";
 import { configureRiver } from "./configs/river";
+
+// GTK
+import { configureGtk3 } from "./configs/gtk3";
+import { configureGtk4 } from "./configs/gtk4";
 
 async function promptConfirmation(message: string): Promise<boolean> {
   const rl = createInterface({
@@ -59,6 +66,7 @@ Chromatic CLI - Configure Linux Colorschemes
 
 Usage:
   chromatic <colorscheme.json> [options]
+  chromatic [options] <colorscheme.json>
 
 Options:
   --help, -h     Show this help message
@@ -81,30 +89,18 @@ Window Managers:
   --sway         Configure Sway window manager borders
   --river        Configure River window manager borders
 
+GTK:
+  --gtk3         Configure GTK 3 (~/.config/gtk-3.0/gtk.css)
+  --gtk4         Configure GTK 4 (~/.config/gtk-4.0/gtk.css)
+
 Examples:
   chromatic colorscheme.json --all
-  chromatic colorscheme.json --vim --foot
-  chromatic colorscheme.json --foot --yes
+  chromatic --cursor colorscheme.json
+  chromatic colorscheme.json --vim --foot --yes
   cat colorscheme.json | chromatic -
 `);
     process.exit(0);
   }
-
-  const jsonPath = args[0];
-  if (!jsonPath) {
-    console.error("Error: No colorscheme file provided");
-    process.exit(1);
-  }
-  let jsonContent: string;
-
-  if (jsonPath === "-") {
-    jsonContent = readFileSync(0, "utf-8");
-  } else {
-    jsonContent = readFileSync(jsonPath, "utf-8");
-  }
-
-  const data: ColorScheme & Config = JSON.parse(jsonContent);
-  const { applications, ...scheme } = data;
 
   // Editors
   const editorFlags = ["--vim", "--vscode", "--cursor"];
@@ -112,16 +108,45 @@ Examples:
   const terminalFlags = ["--foot", "--alacritty", "--kitty", "--xresources"];
   // Window Managers
   const windowManagerFlags = ["--i3", "--sway", "--river"];
+  // GTK
+  const gtkFlags = ["--gtk3", "--gtk4"];
 
-  const appFlags = [...editorFlags, ...terminalFlags, ...windowManagerFlags];
+  const appFlags = [...editorFlags, ...terminalFlags, ...windowManagerFlags, ...gtkFlags];
   const validFlags = ["--help", "-h", "--yes", "-y", "--all", ...appFlags];
+
+  const jsonPath = args.find((arg) => arg === "-" || !arg.startsWith("-"));
+  if (!jsonPath) {
+    console.error("Error: No colorscheme file provided.");
+    console.error("Usage: chromatic <colorscheme.json> [options]");
+    process.exit(1);
+  }
 
   const unknownFlags = args.filter((arg) => arg.startsWith("-") && !validFlags.includes(arg));
   if (unknownFlags.length > 0) {
     console.error(`Error: Unknown flag(s): ${unknownFlags.join(", ")}`);
-    console.error(`Run with --help to see available options.`);
+    console.error("Run with --help to see available options.");
     process.exit(1);
   }
+
+  let jsonContent: string;
+  try {
+    if (jsonPath === "-") {
+      jsonContent = readFileSync(0, "utf-8");
+    } else {
+      if (!existsSync(jsonPath)) {
+        console.error(`Error: Colorscheme file not found: ${jsonPath}`);
+        process.exit(1);
+      }
+      jsonContent = readFileSync(jsonPath, "utf-8");
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`Error: Could not read colorscheme file: ${message}`);
+    process.exit(1);
+  }
+
+  const data: ColorScheme & Config = JSON.parse(jsonContent);
+  const { applications, ...scheme } = data;
 
   const hasExplicitFlags = args.some((arg) => appFlags.includes(arg));
   const configAll = args.includes("--all") || (!hasExplicitFlags && !applications);
@@ -174,7 +199,13 @@ Examples:
     ],
   ];
 
-  const configs = [...editorConfigs, ...terminalConfigs, ...windowManagerConfigs];
+  // GTK
+  const gtkConfigs: Array<[boolean, () => void, string]> = [
+    [shouldConfigure("--gtk3", applications?.gtk3 ?? false), () => configureGtk3(scheme), "GTK 3"],
+    [shouldConfigure("--gtk4", applications?.gtk4 ?? false), () => configureGtk4(scheme), "GTK 4"],
+  ];
+
+  const configs = [...editorConfigs, ...terminalConfigs, ...windowManagerConfigs, ...gtkConfigs];
 
   const appsToConfigure = configs.filter(([shouldRun]) => shouldRun).map(([, , name]) => name);
 

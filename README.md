@@ -7,7 +7,7 @@
 <h1 align="center">Chromatic</h1>
 
 <p align="center" style="font-size: 1.2em; color: #586069;">
-  Finally a normal colorscheme generator for your applications. 
+  Finally a normal colorscheme generator for your applications.
 </p>
 
 ---

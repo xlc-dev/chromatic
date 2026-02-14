@@ -1,5 +1,10 @@
 export function hexToRgb(hex: string): { r: number; g: number; b: number } {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  let normalized = hex.replace(/^#/, "");
+  if (normalized.length === 3) {
+    const [a, b, c] = normalized;
+    normalized = (a ?? "") + (a ?? "") + (b ?? "") + (b ?? "") + (c ?? "") + (c ?? "");
+  }
+  const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(normalized);
   return result && result[1] && result[2] && result[3]
     ? {
         r: parseInt(result[1], 16),
