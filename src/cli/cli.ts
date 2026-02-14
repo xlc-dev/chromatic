@@ -8,18 +8,24 @@ interface Config {
     vim?: boolean;
     vscode?: boolean;
     cursor?: boolean;
+    neovim?: boolean;
     // Terminals
     foot?: boolean;
     alacritty?: boolean;
     kitty?: boolean;
+    wezterm?: boolean;
     xresources?: boolean;
     // Window Managers
     i3?: boolean;
     sway?: boolean;
     river?: boolean;
+    hyprland?: boolean;
     // GTK
     gtk3?: boolean;
     gtk4?: boolean;
+    // Other
+    rofi?: boolean;
+    dunst?: boolean;
   };
 }
 
@@ -27,21 +33,28 @@ interface Config {
 import { configureVim } from "./configs/vim";
 import { configureVSCode } from "./configs/vscode";
 import { configureCursor } from "./configs/cursor";
+import { configureNeovim } from "./configs/neovim";
 
 // Terminals
 import { configureFoot } from "./configs/foot";
 import { configureAlacritty } from "./configs/alacritty";
 import { configureKitty } from "./configs/kitty";
+import { configureWezTerm } from "./configs/wezterm";
 import { configureXresources } from "./configs/xresources";
 
 // Window Managers
 import { configureI3 } from "./configs/i3";
 import { configureSway } from "./configs/sway";
 import { configureRiver } from "./configs/river";
+import { configureHyprland } from "./configs/hyprland";
 
 // GTK
 import { configureGtk3 } from "./configs/gtk3";
 import { configureGtk4 } from "./configs/gtk4";
+
+// Other
+import { configureRofi } from "./configs/rofi";
+import { configureDunst } from "./configs/dunst";
 
 async function promptConfirmation(message: string): Promise<boolean> {
   const rl = createInterface({
@@ -77,21 +90,28 @@ Editors:
   --vim          Configure Vim
   --vscode       Configure VSCode theme
   --cursor       Configure Cursor theme
+  --neovim       Configure Neovim terminal colors
 
 Terminals:
   --foot         Configure Foot terminal
   --alacritty    Configure Alacritty
   --kitty        Configure Kitty
+  --wezterm      Configure WezTerm
   --xresources   Configure Xresources
 
 Window Managers:
   --i3           Configure i3 window manager borders
   --sway         Configure Sway window manager borders
   --river        Configure River window manager borders
+  --hyprland     Configure Hyprland border colors
 
 GTK:
   --gtk3         Configure GTK 3 (~/.config/gtk-3.0/gtk.css)
   --gtk4         Configure GTK 4 (~/.config/gtk-4.0/gtk.css)
+
+Other:
+  --rofi         Write Rofi theme (~/.config/rofi/chromatic.rasi)
+  --dunst        Configure Dunst notification colors
 
 Examples:
   chromatic colorscheme.json --all
@@ -103,15 +123,17 @@ Examples:
   }
 
   // Editors
-  const editorFlags = ["--vim", "--vscode", "--cursor"];
+  const editorFlags = ["--vim", "--vscode", "--cursor", "--neovim"];
   // Terminals
-  const terminalFlags = ["--foot", "--alacritty", "--kitty", "--xresources"];
+  const terminalFlags = ["--foot", "--alacritty", "--kitty", "--wezterm", "--xresources"];
   // Window Managers
-  const windowManagerFlags = ["--i3", "--sway", "--river"];
+  const windowManagerFlags = ["--i3", "--sway", "--river", "--hyprland"];
   // GTK
   const gtkFlags = ["--gtk3", "--gtk4"];
+  // Other
+  const otherFlags = ["--rofi", "--dunst"];
 
-  const appFlags = [...editorFlags, ...terminalFlags, ...windowManagerFlags, ...gtkFlags];
+  const appFlags = [...editorFlags, ...terminalFlags, ...windowManagerFlags, ...gtkFlags, ...otherFlags];
   const validFlags = ["--help", "-h", "--yes", "-y", "--all", ...appFlags];
 
   const jsonPath = args.find((arg) => arg === "-" || !arg.startsWith("-"));
@@ -166,6 +188,11 @@ Examples:
       () => configureCursor(scheme),
       "Cursor",
     ],
+    [
+      shouldConfigure("--neovim", applications?.neovim ?? false),
+      () => configureNeovim(scheme),
+      "Neovim",
+    ],
   ];
 
   // Terminals
@@ -180,6 +207,11 @@ Examples:
       shouldConfigure("--kitty", applications?.kitty ?? false),
       () => configureKitty(scheme),
       "Kitty",
+    ],
+    [
+      shouldConfigure("--wezterm", applications?.wezterm ?? false),
+      () => configureWezTerm(scheme),
+      "WezTerm",
     ],
     [
       shouldConfigure("--xresources", applications?.xresources ?? false),
@@ -197,6 +229,11 @@ Examples:
       () => configureRiver(scheme),
       "River",
     ],
+    [
+      shouldConfigure("--hyprland", applications?.hyprland ?? false),
+      () => configureHyprland(scheme),
+      "Hyprland",
+    ],
   ];
 
   // GTK
@@ -205,7 +242,19 @@ Examples:
     [shouldConfigure("--gtk4", applications?.gtk4 ?? false), () => configureGtk4(scheme), "GTK 4"],
   ];
 
-  const configs = [...editorConfigs, ...terminalConfigs, ...windowManagerConfigs, ...gtkConfigs];
+  // Other
+  const otherConfigs: Array<[boolean, () => void, string]> = [
+    [shouldConfigure("--rofi", applications?.rofi ?? false), () => configureRofi(scheme), "Rofi"],
+    [shouldConfigure("--dunst", applications?.dunst ?? false), () => configureDunst(scheme), "Dunst"],
+  ];
+
+  const configs = [
+    ...editorConfigs,
+    ...terminalConfigs,
+    ...windowManagerConfigs,
+    ...gtkConfigs,
+    ...otherConfigs,
+  ];
 
   const appsToConfigure = configs.filter(([shouldRun]) => shouldRun).map(([, , name]) => name);
 
