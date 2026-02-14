@@ -10,10 +10,7 @@ function updateSection(
   background: string,
   foreground: string
 ): string {
-  const sectionRegex = new RegExp(
-    `(\\[${sectionName}\\])([\\s\\S]*?)(?=\\n\\[|$)`,
-    "m"
-  );
+  const sectionRegex = new RegExp(`(\\[${sectionName}\\])([\\s\\S]*?)(?=\\n\\[|$)`, "m");
   const match = config.match(sectionRegex);
   let sectionContent: string;
   if (match && match[2]) {

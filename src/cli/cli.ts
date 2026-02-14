@@ -133,7 +133,13 @@ Examples:
   // Other
   const otherFlags = ["--rofi", "--dunst"];
 
-  const appFlags = [...editorFlags, ...terminalFlags, ...windowManagerFlags, ...gtkFlags, ...otherFlags];
+  const appFlags = [
+    ...editorFlags,
+    ...terminalFlags,
+    ...windowManagerFlags,
+    ...gtkFlags,
+    ...otherFlags,
+  ];
   const validFlags = ["--help", "-h", "--yes", "-y", "--all", ...appFlags];
 
   const jsonPath = args.find((arg) => arg === "-" || !arg.startsWith("-"));
@@ -245,7 +251,11 @@ Examples:
   // Other
   const otherConfigs: Array<[boolean, () => void, string]> = [
     [shouldConfigure("--rofi", applications?.rofi ?? false), () => configureRofi(scheme), "Rofi"],
-    [shouldConfigure("--dunst", applications?.dunst ?? false), () => configureDunst(scheme), "Dunst"],
+    [
+      shouldConfigure("--dunst", applications?.dunst ?? false),
+      () => configureDunst(scheme),
+      "Dunst",
+    ],
   ];
 
   const configs = [

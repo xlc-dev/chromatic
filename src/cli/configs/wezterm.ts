@@ -1,7 +1,13 @@
 import { join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
-import { ensureDir, writeConfigFile, readConfigFile, updateOrAppendLine, type ConfigUpdate } from "../utils";
+import {
+  ensureDir,
+  writeConfigFile,
+  readConfigFile,
+  updateOrAppendLine,
+  type ConfigUpdate,
+} from "../utils";
 
 export function configureWezTerm(scheme: ColorScheme): void {
   const configDir = join(homedir(), ".config", "wezterm");
