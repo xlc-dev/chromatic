@@ -5,7 +5,7 @@ import { ensureDir, writeConfigFile } from "../utils";
 
 const GTK4_THEME_CSS = `
 * {
-  outline-color: alpha(@theme_fg, 0.3);
+  outline-width: 0;
   -gtk-secondary-caret-color: @theme_selected_bg;
 }
 
@@ -45,8 +45,7 @@ entry {
 }
 
 entry:focus {
-  box-shadow: inset 0 0 0 1px @theme_selected_bg;
-  border-color: @theme_border;
+  border-color: @theme_selected_bg;
 }
 
 entry:disabled {
@@ -73,7 +72,6 @@ entry.error {
 }
 
 entry.error:focus {
-  box-shadow: inset 0 0 0 1px @theme_error;
   border-color: @theme_error;
 }
 
@@ -83,7 +81,6 @@ entry.warning {
 }
 
 entry.warning:focus {
-  box-shadow: inset 0 0 0 1px @theme_warning;
   border-color: @theme_warning;
 }
 
@@ -93,37 +90,48 @@ entry progress {
 
 button {
   color: @theme_fg;
-  outline-color: alpha(@theme_fg, 0.3);
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg;
 }
 
 button:hover {
   color: @theme_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_hover;
 }
 
 button:active, button:checked {
   color: @theme_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_active;
 }
 
 button:backdrop {
   color: @theme_backdrop_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg;
 }
 
 button:backdrop:active, button:backdrop:checked {
   color: @theme_backdrop_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_active;
 }
 
 button:disabled {
   color: @theme_insensitive_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_insensitive;
 }
@@ -148,15 +156,18 @@ button.flat:backdrop, button.flat:disabled {
 
 button.suggested-action {
   color: @theme_fg;
-  outline-color: alpha(@theme_fg, 0.3);
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_selected_bg;
   background-color: @theme_selected_bg;
 }
 
 button.suggested-action:hover {
   color: @theme_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_selected_bg;
-  background-color: @theme_selected_bg;
+  background-color: shade(@theme_selected_bg, 1.05);
 }
 
 button.suggested-action:active, button.suggested-action:checked {
@@ -173,11 +184,16 @@ button.suggested-action:backdrop {
 
 button.destructive-action {
   color: @theme_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_error;
   background-color: @theme_error;
 }
 
 button.destructive-action:hover {
+  border-width: 1px;
+  border-style: solid;
+  border-color: @theme_error;
   background-color: shade(@theme_error, 1.1);
 }
 

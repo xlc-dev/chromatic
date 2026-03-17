@@ -158,8 +158,7 @@ spinbutton:not(.vertical), entry {
 }
 
 spinbutton:focus:not(.vertical), entry:focus {
-  box-shadow: inset 0 0 0 1px @theme_selected_bg;
-  border-color: @theme_border;
+  border-color: @theme_selected_bg;
 }
 
 spinbutton:disabled:not(.vertical), entry:disabled {
@@ -186,7 +185,6 @@ spinbutton.error:not(.vertical), entry.error {
 }
 
 spinbutton.error:focus:not(.vertical), entry.error:focus {
-  box-shadow: inset 0 0 0 1px @theme_error;
   border-color: @theme_error;
 }
 
@@ -200,7 +198,6 @@ spinbutton.warning:not(.vertical), entry.warning {
 }
 
 spinbutton.warning:focus:not(.vertical), entry.warning:focus {
-  box-shadow: inset 0 0 0 1px @theme_warning;
   border-color: @theme_warning;
 }
 
@@ -226,7 +223,6 @@ spinbutton:not(.vertical) image:backdrop, entry image:backdrop {
 
 spinbutton:drop(active):not(.vertical), entry:drop(active):focus, entry:drop(active) {
   border-color: @theme_success;
-  box-shadow: inset 0 0 0 1px @theme_success;
 }
 
 .osd spinbutton:not(.vertical), .osd entry {
@@ -241,9 +237,6 @@ spinbutton:drop(active):not(.vertical), entry:drop(active):focus, entry:drop(act
   color: @theme_fg;
   border-color: @theme_selected_bg;
   background-color: @theme_bg;
-  box-shadow: inset 0 0 0 1px @theme_selected_bg;
-  text-shadow: 0 1px @theme_bg_active;
-  -gtk-icon-shadow: 0 1px @theme_bg_active;
 }
 
 .osd spinbutton:backdrop:not(.vertical), .osd entry:backdrop {
@@ -345,102 +338,89 @@ treeview entry.flat:focus, treeview entry:focus {
 
 button.titlebutton, notebook > header > tabs > arrow, button {
   color: @theme_fg;
-  outline-color: alpha(@theme_fg, 0.3);
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
-  border-bottom-color: @theme_bg_active;
   background-color: @theme_bg;
-  text-shadow: 0 -1px alpha(@theme_bg_active, 0.83);
-  -gtk-icon-shadow: 0 -1px alpha(@theme_bg_active, 0.83);
-  box-shadow: inset 0 1px alpha(@theme_fg, 0.02), 0 1px 2px alpha(@theme_bg_active, 0.07);
 }
 
 button.titlebutton, button.sidebar-button, notebook > header > tabs > arrow, notebook > header > tabs > arrow.flat, button.flat {
   border-color: transparent;
   background-color: transparent;
-  text-shadow: none;
-  -gtk-icon-shadow: none;
 }
 
 notebook > header > tabs > arrow:hover, button:hover {
   color: @theme_fg;
-  outline-color: alpha(@theme_fg, 0.3);
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
-  border-bottom-color: @theme_bg_active;
   background-color: @theme_bg_hover;
-  text-shadow: 0 -1px alpha(@theme_bg_active, 0.79);
-  -gtk-icon-shadow: 0 -1px alpha(@theme_bg_active, 0.79);
-  box-shadow: inset 0 1px alpha(@theme_fg, 0.02), 0 1px 2px alpha(@theme_bg_active, 0.07);
 }
 
 notebook > header > tabs > arrow:active, notebook > header > tabs > arrow:checked, button:active, button:checked {
   color: @theme_fg;
-  outline-color: alpha(@theme_fg, 0.3);
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_active;
-  text-shadow: none;
-  -gtk-icon-shadow: none;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 notebook > header > tabs > arrow:backdrop, button:backdrop.flat, button:backdrop {
   color: @theme_backdrop_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg;
-  text-shadow: none;
-  -gtk-icon-shadow: none;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 notebook > header > tabs > arrow:backdrop:active, notebook > header > tabs > arrow:backdrop:checked, button:backdrop.flat:active, button:backdrop.flat:checked, button:backdrop:active, button:backdrop:checked {
   color: @theme_backdrop_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_active;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 notebook > header > tabs > arrow:backdrop:disabled, button:backdrop.flat:disabled, button:backdrop:disabled {
   color: @theme_insensitive_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_insensitive;
-  text-shadow: none;
-  -gtk-icon-shadow: none;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 notebook > header > tabs > arrow:backdrop:disabled:active, notebook > header > tabs > arrow:backdrop:disabled:checked, button:backdrop.flat:disabled:active, button:backdrop.flat:disabled:checked, button:backdrop:disabled:active, button:backdrop:disabled:checked {
   color: @theme_insensitive_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_active;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 button.titlebutton:backdrop, button.sidebar-button:backdrop, notebook > header > tabs > arrow:backdrop, button.titlebutton:disabled, button.sidebar-button:disabled, notebook > header > tabs > arrow:disabled, button.flat:backdrop, button.flat:disabled, button.flat:backdrop:disabled {
   border-color: transparent;
   background-color: transparent;
-  text-shadow: none;
-  -gtk-icon-shadow: none;
 }
 
 notebook > header > tabs > arrow:disabled, button:disabled {
   color: @theme_insensitive_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_insensitive;
-  text-shadow: none;
-  -gtk-icon-shadow: none;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 notebook > header > tabs > arrow:disabled:active, notebook > header > tabs > arrow:disabled:checked, button:disabled:active, button:disabled:checked {
   color: @theme_insensitive_fg;
+  border-width: 1px;
+  border-style: solid;
   border-color: @theme_border;
   background-color: @theme_bg_active;
-  box-shadow: inset 0 1px alpha(@theme_fg, 0);
 }
 
 combobox:drop(active) button.combo, notebook > header > tabs > arrow:drop(active), button:drop(active) {
   color: @theme_success;
   border-color: @theme_success;
-  box-shadow: inset 0 0 0 1px @theme_success;
 }
 
 row:selected button.sidebar-button:not(:active):not(:checked):not(:hover):not(disabled), row:selected button.flat:not(:active):not(:checked):not(:hover):not(disabled) {
@@ -602,8 +582,7 @@ combobox button.combo {
 }
 
 combobox button.combo:focus {
-  border-color: @theme_border;
-  box-shadow: inset 0 0 0 1px @theme_selected_bg;
+  border-color: @theme_selected_bg;
 }
 
 combobox button.combo:hover {
