@@ -253,8 +253,9 @@ export default function Preview(props: PreviewProps) {
         <div>
           <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Colorscheme Preview</h2>
           <p class="text-[#8b949e] text-xs mb-0 leading-relaxed max-w-md">
-            Sample editor and terminal using your palette. Your real apps may look a bit different
-            depending on font, highlighter parser, type of application, etc.
+            Sample editor and terminal using your palette. This is not a 1-1 representation. Your
+            real apps may look a bit different depending on font, highlighter parser, type of
+            application, etc.
           </p>
         </div>
         <div
