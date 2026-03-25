@@ -30,20 +30,27 @@ function parseCodeExample(example: CodeExample, language: Language): CodeLine[] 
   }));
 }
 
-function measureTextWidth(text: string, fontSize: string, fontFamily: string): number {
-  const canvas = document.createElement("canvas");
-  const context = canvas.getContext("2d");
-  if (!context) return text.length * 8;
-  context.font = `${fontSize} ${fontFamily}`;
-  return context.measureText(text).width;
+let measureCanvas: HTMLCanvasElement | null = null;
+let measureCtx: CanvasRenderingContext2D | null = null;
+
+function measureTextWidth(text: string, font: string): number {
+  if (typeof document === "undefined") return text.length * 8;
+  if (!measureCanvas) measureCanvas = document.createElement("canvas");
+  if (!measureCtx) measureCtx = measureCanvas.getContext("2d");
+  if (!measureCtx) return text.length * 8;
+  measureCtx.font = font;
+  return measureCtx.measureText(text).width;
 }
 
-function wrapLine(line: CodeLine, maxWidthPx: number, lineNumberWidthPx: number): WrappedLine[] {
-  const fontSize = "0.8rem";
-  const fontFamily = '"Fira Code", "Courier New", monospace';
+function wrapLine(
+  line: CodeLine,
+  maxWidthPx: number,
+  lineNumberWidthPx: number,
+  font: string
+): WrappedLine[] {
   const availableWidth = maxWidthPx - lineNumberWidthPx - 32;
 
-  const fullLineWidth = measureTextWidth(line.content, fontSize, fontFamily);
+  const fullLineWidth = measureTextWidth(line.content, font);
 
   if (fullLineWidth <= availableWidth) {
     return [{ tokens: line.tokens, isContinuation: false, originalLineIndex: 0 }];
@@ -60,7 +67,7 @@ function wrapLine(line: CodeLine, maxWidthPx: number, lineNumberWidthPx: number)
       tokenIndex++;
       continue;
     }
-    const tokenWidth = measureTextWidth(token.text, fontSize, fontFamily);
+    const tokenWidth = measureTextWidth(token.text, font);
 
     if (currentWidth + tokenWidth <= availableWidth) {
       currentTokens.push(token);
@@ -83,7 +90,7 @@ function wrapLine(line: CodeLine, maxWidthPx: number, lineNumberWidthPx: number)
             charIndex++;
             continue;
           }
-          const charWidth = measureTextWidth(char, fontSize, fontFamily);
+          const charWidth = measureTextWidth(char, font);
 
           if (currentWidth + charWidth <= availableWidth) {
             const lastToken = currentTokens[currentTokens.length - 1];
@@ -165,12 +172,13 @@ export default function Preview(props: PreviewProps) {
 
     const containerWidth = editorContentRef.clientWidth;
     const lineNumberWidth = 56;
+    const font = getComputedStyle(editorContentRef).font || "12px ui-monospace, monospace";
 
     const wrapped: WrappedLine[] = [];
     let lineIndex = 0;
 
     for (const line of currentLines()) {
-      const lines = wrapLine(line, containerWidth, lineNumberWidth);
+      const lines = wrapLine(line, containerWidth, lineNumberWidth, font);
       for (const wrappedLine of lines) {
         wrapped.push({
           ...wrappedLine,
@@ -233,13 +241,20 @@ export default function Preview(props: PreviewProps) {
   });
 
   return (
-    <div class="bg-[#161b22] rounded-lg border border-[#30363d] shadow-[0_1px_3px_rgba(0,0,0,0.3)] p-8 relative overflow-hidden min-h-[600px] max-[768px]:p-6 max-[640px]:p-4">
+    <div
+      class="chromatic-preview-scroll bg-[#161b22] rounded-lg border border-[#30363d] shadow-[0_1px_3px_rgba(0,0,0,0.3)] p-8 relative overflow-hidden min-h-[600px] max-[768px]:p-6 max-[640px]:p-4"
+      style={{
+        "--preview-scrollbar-track": props.scheme.black,
+        "--preview-scrollbar-thumb": props.scheme.brightBlack,
+      }}
+    >
       <div class="absolute inset-0 rounded-lg p-px bg-gradient-to-br from-[#58a6ff33] via-[#bc8cff33] via-[#f8514933] to-[#3fb95033] pointer-events-none opacity-0 transition-opacity duration-300 hover:opacity-100 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [-webkit-mask-composite:xor] [mask-composite:exclude]"></div>
       <div class="flex justify-between items-start mb-8 gap-8 max-[1200px]:flex-col max-[1200px]:items-start max-[1200px]:gap-4">
         <div>
           <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Colorscheme Preview</h2>
-          <p class="text-[#8b949e] text-xs mb-0 leading-relaxed">
-            See what your colorscheme looks like.
+          <p class="text-[#8b949e] text-xs mb-0 leading-relaxed max-w-md">
+            Sample editor and terminal using your palette. Your real apps may look a bit different
+            depending on font, highlighter parser, type of application, etc.
           </p>
         </div>
         <div
@@ -313,12 +328,13 @@ export default function Preview(props: PreviewProps) {
 
       <div class="relative w-full min-h-[600px] mt-8 max-[1024px]:min-h-[500px] max-[768px]:min-h-[450px] max-[768px]:mt-6 max-[640px]:min-h-[400px] max-[640px]:mt-4">
         <div
-          class={`absolute border-2 rounded-lg bg-[#0d1117] shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden w-[70%] h-[80%] top-[2%] left-[3%] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.6)] max-[1024px]:w-[85%] max-[1024px]:h-[55%] max-[1024px]:top-[5%] max-[1024px]:left-[5%] max-[768px]:w-[90%] max-[768px]:h-[50%] max-[768px]:top-[5%] max-[768px]:left-[5%] max-[640px]:w-[95%] max-[640px]:h-[45%] ${
+          class={`absolute border-2 rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden w-[70%] h-[80%] top-[2%] left-[3%] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.6)] max-[1024px]:w-[85%] max-[1024px]:h-[55%] max-[1024px]:top-[5%] max-[1024px]:left-[5%] max-[768px]:w-[90%] max-[768px]:h-[50%] max-[768px]:top-[5%] max-[768px]:left-[5%] max-[640px]:w-[95%] max-[640px]:h-[45%] ${
             activeWindow() === "editor"
               ? "z-[2] shadow-[0_12px_32px_rgba(0,0,0,0.6)]"
               : "z-[1] opacity-95"
           }`}
           style={{
+            background: props.scheme.background,
             "border-color":
               activeWindow() === "editor" ? props.scheme.activeBorder : props.scheme.inactiveBorder,
           }}
@@ -361,12 +377,13 @@ export default function Preview(props: PreviewProps) {
         </div>
 
         <div
-          class={`absolute border-2 rounded-lg bg-[#0d1117] shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden w-[65%] h-[70%] top-[20%] right-[3%] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.6)] max-[1024px]:w-[80%] max-[1024px]:h-[50%] max-[1024px]:top-[50%] max-[1024px]:right-[5%] max-[768px]:w-[85%] max-[768px]:h-[45%] max-[768px]:top-[55%] max-[768px]:right-[5%] max-[640px]:w-[95%] max-[640px]:h-[40%] max-[640px]:top-[50%] ${
+          class={`absolute border-2 rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden w-[65%] h-[70%] top-[20%] right-[3%] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.6)] max-[1024px]:w-[80%] max-[1024px]:h-[50%] max-[1024px]:top-[50%] max-[1024px]:right-[5%] max-[768px]:w-[85%] max-[768px]:h-[45%] max-[768px]:top-[55%] max-[768px]:right-[5%] max-[640px]:w-[95%] max-[640px]:h-[40%] max-[640px]:top-[50%] ${
             activeWindow() === "terminal"
               ? "z-[2] shadow-[0_12px_32px_rgba(0,0,0,0.6)]"
               : "z-[1] opacity-95"
           }`}
           style={{
+            background: props.scheme.background,
             "border-color":
               activeWindow() === "terminal"
                 ? props.scheme.activeBorder

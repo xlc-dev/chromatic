@@ -8,7 +8,7 @@ interface WindowHeaderProps {
 export default function WindowHeader(props: WindowHeaderProps) {
   return (
     <div
-      class="bg-[rgba(13,17,23,0.9)] px-3 py-2 flex items-center gap-2 border-b border-white/10 select-none"
+      class="px-3 py-2 flex items-center gap-2 border-b select-none"
       style={{
         background: props.scheme.brightBlack,
         "border-bottom-color": props.scheme.black,

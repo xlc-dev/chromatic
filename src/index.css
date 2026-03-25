@@ -97,3 +97,23 @@
 :where(*):not(html):not(body)::-webkit-scrollbar-thumb:hover {
   background: #484f58;
 }
+
+.chromatic-preview-scroll :where(*):not(html):not(body) {
+  scrollbar-color: var(--preview-scrollbar-thumb) var(--preview-scrollbar-track);
+}
+
+.chromatic-preview-scroll :where(*):not(html):not(body)::-webkit-scrollbar-track {
+  background: var(--preview-scrollbar-track);
+  border-left: 1px solid color-mix(in srgb, var(--preview-scrollbar-thumb) 55%, transparent);
+}
+
+.chromatic-preview-scroll :where(*):not(html):not(body)::-webkit-scrollbar-thumb {
+  background: var(--preview-scrollbar-thumb);
+  border-radius: 5px;
+  border: 2px solid var(--preview-scrollbar-track);
+  min-height: 40px;
+}
+
+.chromatic-preview-scroll :where(*):not(html):not(body)::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--preview-scrollbar-thumb) 82%, #fff);
+}
