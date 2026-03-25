@@ -14,6 +14,7 @@ import { configureI3 } from "./configs/i3";
 import { configureSway } from "./configs/sway";
 import { configureRiver } from "./configs/river";
 import { configureHyprland } from "./configs/hyprland";
+import { configureMango } from "./configs/mango";
 import { configureGtk3 } from "./configs/gtk3";
 import { configureGtk4 } from "./configs/gtk4";
 import { configureRofi } from "./configs/rofi";
@@ -150,6 +151,15 @@ const APPS: AppConfig[] = [
     pathFlag: "--hyprland-path",
     pathKind: "file",
     configure: configureHyprland,
+  },
+  {
+    key: "mango",
+    name: "Mango",
+    group: "Window Managers",
+    appFlag: "--mango",
+    pathFlag: "--mango-path",
+    pathKind: "file",
+    configure: configureMango,
   },
   {
     key: "gtk3",
