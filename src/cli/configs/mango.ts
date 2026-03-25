@@ -19,7 +19,7 @@ export function configureMango(scheme: ColorScheme, configPath?: string): void {
     },
     {
       pattern: /^\s*maximizescreencolor\s*=\s*[^\n]+/m,
-      line: `maximizescreencolor=${hexToRiverFormat(scheme.brightBlue)}`,
+      line: `maximizescreencolor=${hexToRiverFormat(scheme.yellow)}`,
     },
     {
       pattern: /^\s*urgentcolor\s*=\s*[^\n]+/m,
@@ -27,11 +27,11 @@ export function configureMango(scheme: ColorScheme, configPath?: string): void {
     },
     {
       pattern: /^\s*scratchpadcolor\s*=\s*[^\n]+/m,
-      line: `scratchpadcolor=${hexToRiverFormat(scheme.brightMagenta)}`,
+      line: `scratchpadcolor=${hexToRiverFormat(scheme.magenta)}`,
     },
     {
       pattern: /^\s*globalcolor\s*=\s*[^\n]+/m,
-      line: `globalcolor=${hexToRiverFormat(scheme.foreground)}`,
+      line: `globalcolor=${hexToRiverFormat(scheme.green)}`,
     },
     {
       pattern: /^\s*overlaycolor\s*=\s*[^\n]+/m,
