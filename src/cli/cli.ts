@@ -21,6 +21,7 @@ import { configureDunst } from "./configs/dunst";
 
 type AppGroup = "Editors" | "Terminals" | "Window Managers" | "GTK" | "Other";
 type PathKind = "file" | "dir";
+type PathOverrides = Partial<Record<string, string>>;
 
 type AppConfig = {
   key: string;
@@ -188,7 +189,13 @@ const APPS: AppConfig[] = [
   },
 ];
 
-type PathOverrides = Partial<Record<string, string>>;
+function fail(message: string, usage?: string): never {
+  console.error(`Error: ${message}`);
+  if (usage) {
+    console.error(usage);
+  }
+  process.exit(1);
+}
 
 async function promptConfirmation(message: string): Promise<boolean> {
   const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -263,13 +270,11 @@ async function main() {
     if (pathFlags.includes(arg)) {
       const value = args[i + 1];
       if (!value || value.startsWith("-")) {
-        console.error(`Error: Missing path value for ${arg}`);
-        process.exit(1);
+        fail(`Missing path value for ${arg}`);
       }
       const app = pathFlagToApp.get(arg);
       if (!app) {
-        console.error(`Error: Unknown path override flag: ${arg}`);
-        process.exit(1);
+        fail(`Unknown path override flag: ${arg}`);
       }
       pathOverrides[app.key] = value;
       i++;
@@ -277,41 +282,32 @@ async function main() {
     }
     if (validFlags.includes(arg)) continue;
     if (arg.startsWith("-")) {
-      console.error(`Error: Unknown flag: ${arg}`);
-      console.error("Run with --help to see available options.");
-      process.exit(1);
+      fail(`Unknown flag: ${arg}`, "Run with --help to see available options.");
     }
     if (!jsonPath) {
       jsonPath = arg;
       continue;
     }
-    console.error(`Error: Unexpected extra argument: ${arg}`);
-    console.error("Usage: chromatic <colorscheme.json> [options]");
-    process.exit(1);
+    fail(`Unexpected extra argument: ${arg}`, "Usage: chromatic <colorscheme.json> [options]");
   }
 
   if (!jsonPath) {
-    console.error("Error: No colorscheme file provided.");
-    console.error("Usage: chromatic <colorscheme.json> [options]");
-    process.exit(1);
+    fail("No colorscheme file provided.", "Usage: chromatic <colorscheme.json> [options]");
   }
 
   for (const [appKey, overridePath] of Object.entries(pathOverrides)) {
     if (typeof overridePath !== "string" || !overridePath.trim()) {
-      console.error(`Error: Empty path provided for ${appKey}.`);
-      process.exit(1);
+      fail(`Empty path provided for ${appKey}.`);
     }
     if (!existsSync(overridePath)) continue;
     const app = APPS.find((candidate) => candidate.key === appKey);
     if (!app) continue;
     const stats = statSync(overridePath);
     if (app.pathKind === "dir" && !stats.isDirectory()) {
-      console.error(`Error: ${appKey} path must be a directory: ${overridePath}`);
-      process.exit(1);
+      fail(`${appKey} path must be a directory: ${overridePath}`);
     }
     if (app.pathKind === "file" && !stats.isFile()) {
-      console.error(`Error: ${appKey} path must be a file path: ${overridePath}`);
-      process.exit(1);
+      fail(`${appKey} path must be a file path: ${overridePath}`);
     }
   }
 
@@ -321,18 +317,23 @@ async function main() {
       jsonContent = readFileSync(0, "utf-8");
     } else {
       if (!existsSync(jsonPath)) {
-        console.error(`Error: Colorscheme file not found: ${jsonPath}`);
-        process.exit(1);
+        fail(`Colorscheme file not found: ${jsonPath}`);
       }
       jsonContent = readFileSync(jsonPath, "utf-8");
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`Error: Could not read colorscheme file: ${message}`);
-    process.exit(1);
+    fail(`Could not read colorscheme file: ${message}`);
   }
 
-  const scheme: ColorScheme = JSON.parse(jsonContent);
+  let scheme: ColorScheme;
+  try {
+    scheme = JSON.parse(jsonContent) as ColorScheme;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    fail(`Invalid colorscheme JSON: ${message}`);
+  }
+
   const hasExplicitFlags = args.some((arg) => appFlags.includes(arg));
   const configAll = args.includes("--all") || !hasExplicitFlags;
   const configs: Array<[boolean, () => void, string]> = APPS.map((app) => [
@@ -369,7 +370,9 @@ async function main() {
   });
 }
 
-main().catch((error) => {
-  console.error("Error:", error);
-  process.exit(1);
-});
+try {
+  await main();
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  fail(`Unexpected failure: ${message}`);
+}
