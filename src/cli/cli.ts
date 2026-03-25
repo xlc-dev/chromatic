@@ -225,7 +225,7 @@ function buildHelpText(): string {
   }).join("\n");
 
   return `
-Chromatic CLI - Configure Linux Colorschemes
+Chromatic CLI - Configure Colorschemes
 
 Usage:
   chromatic <colorscheme.json> [options]
