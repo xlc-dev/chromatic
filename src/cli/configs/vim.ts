@@ -3,7 +3,7 @@ import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, type ConfigUpdate } from "../utils";
 
-export function configureVim(scheme: ColorScheme): void {
+export function configureVim(scheme: ColorScheme, configPath?: string): void {
   const updates: ConfigUpdate[] = [
     {
       pattern: /^\s*let g:terminal_color_0\s*=/m,
@@ -79,5 +79,6 @@ export function configureVim(scheme: ColorScheme): void {
     },
   ];
 
-  updateConfigFile(join(homedir(), ".vimrc"), null, updates);
+  const resolvedConfigPath = configPath ?? join(homedir(), ".vimrc");
+  updateConfigFile(resolvedConfigPath, null, updates);
 }

@@ -1,31 +1,26 @@
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, statSync } from "fs";
 import { createInterface } from "readline";
 import type { ColorScheme } from "../types";
 
 interface Config {
-  applications?: {
-    // Editors
-    vim?: boolean;
-    vscode?: boolean;
-    cursor?: boolean;
-    neovim?: boolean;
-    // Terminals
-    foot?: boolean;
-    alacritty?: boolean;
-    kitty?: boolean;
-    wezterm?: boolean;
-    xresources?: boolean;
-    // Window Managers
-    i3?: boolean;
-    sway?: boolean;
-    river?: boolean;
-    hyprland?: boolean;
-    // GTK
-    gtk3?: boolean;
-    gtk4?: boolean;
-    // Other
-    rofi?: boolean;
-    dunst?: boolean;
+  pathOverrides?: {
+    vim?: string;
+    vscode?: string;
+    cursor?: string;
+    neovim?: string;
+    foot?: string;
+    alacritty?: string;
+    kitty?: string;
+    wezterm?: string;
+    xresources?: string;
+    i3?: string;
+    sway?: string;
+    river?: string;
+    hyprland?: string;
+    gtk3?: string;
+    gtk4?: string;
+    rofi?: string;
+    dunst?: string;
   };
 }
 
@@ -113,6 +108,25 @@ Other:
   --rofi         Write Rofi theme (~/.config/rofi/chromatic.rasi)
   --dunst        Configure Dunst notification colors
 
+Path overrides:
+  --vim-path <path>         Override Vim config path
+  --vscode-path <dir>       Override VSCode extension dir
+  --cursor-path <dir>       Override Cursor extension dir
+  --neovim-path <path>      Override Neovim init path
+  --foot-path <path>        Override Foot config path
+  --alacritty-path <path>   Override Alacritty config path
+  --kitty-path <path>       Override Kitty config path
+  --wezterm-path <dir>      Override WezTerm config directory
+  --xresources-path <path>  Override Xresources path
+  --i3-path <path>          Override i3 config path
+  --sway-path <path>        Override Sway config path
+  --river-path <path>       Override River init path
+  --hyprland-path <path>    Override Hyprland config path
+  --gtk3-path <path>        Override GTK 3 css path
+  --gtk4-path <path>        Override GTK 4 css path
+  --rofi-path <path>        Override Rofi theme path
+  --dunst-path <path>       Override Dunst config path
+
 Examples:
   chromatic colorscheme.json --all
   chromatic --cursor colorscheme.json
@@ -140,20 +154,106 @@ Examples:
     ...gtkFlags,
     ...otherFlags,
   ];
-  const validFlags = ["--help", "-h", "--yes", "-y", "--all", ...appFlags];
+  const pathFlagToApp: Record<string, keyof NonNullable<Config["pathOverrides"]>> = {
+    "--vim-path": "vim",
+    "--vscode-path": "vscode",
+    "--cursor-path": "cursor",
+    "--neovim-path": "neovim",
+    "--foot-path": "foot",
+    "--alacritty-path": "alacritty",
+    "--kitty-path": "kitty",
+    "--wezterm-path": "wezterm",
+    "--xresources-path": "xresources",
+    "--i3-path": "i3",
+    "--sway-path": "sway",
+    "--river-path": "river",
+    "--hyprland-path": "hyprland",
+    "--gtk3-path": "gtk3",
+    "--gtk4-path": "gtk4",
+    "--rofi-path": "rofi",
+    "--dunst-path": "dunst",
+  };
+  const pathFlags = Object.keys(pathFlagToApp);
+  const validFlags = ["--help", "-h", "--yes", "-y", "--all", ...appFlags, ...pathFlags];
 
-  const jsonPath = args.find((arg) => arg === "-" || !arg.startsWith("-"));
+  let jsonPath: string | null = null;
+  const pathOverrides: NonNullable<Config["pathOverrides"]> = {};
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (!arg) continue;
+
+    if (pathFlags.includes(arg)) {
+      const value = args[i + 1];
+      if (!value || value.startsWith("-")) {
+        console.error(`Error: Missing path value for ${arg}`);
+        process.exit(1);
+      }
+      const app = pathFlagToApp[arg];
+      if (!app) {
+        console.error(`Error: Unknown path override flag: ${arg}`);
+        process.exit(1);
+      }
+      pathOverrides[app] = value;
+      i++;
+      continue;
+    }
+
+    if (validFlags.includes(arg)) {
+      continue;
+    }
+
+    if (arg.startsWith("-")) {
+      console.error(`Error: Unknown flag: ${arg}`);
+      console.error("Run with --help to see available options.");
+      process.exit(1);
+    }
+
+    if (!jsonPath) {
+      jsonPath = arg;
+      continue;
+    }
+
+    console.error(`Error: Unexpected extra argument: ${arg}`);
+    console.error("Usage: chromatic <colorscheme.json> [options]");
+    process.exit(1);
+  }
+
   if (!jsonPath) {
     console.error("Error: No colorscheme file provided.");
     console.error("Usage: chromatic <colorscheme.json> [options]");
     process.exit(1);
   }
 
-  const unknownFlags = args.filter((arg) => arg.startsWith("-") && !validFlags.includes(arg));
-  if (unknownFlags.length > 0) {
-    console.error(`Error: Unknown flag(s): ${unknownFlags.join(", ")}`);
-    console.error("Run with --help to see available options.");
-    process.exit(1);
+  const directoryOverrideApps = new Set<keyof NonNullable<Config["pathOverrides"]>>([
+    "wezterm",
+    "vscode",
+    "cursor",
+  ]);
+  for (const [app, overridePath] of Object.entries(pathOverrides)) {
+    if (!overridePath || !overridePath.trim()) {
+      console.error(`Error: Empty path provided for ${app}.`);
+      process.exit(1);
+    }
+
+    if (!existsSync(overridePath)) {
+      continue;
+    }
+
+    const stats = statSync(overridePath);
+    const expectsDirectory = directoryOverrideApps.has(
+      app as keyof NonNullable<Config["pathOverrides"]>
+    );
+
+    if (expectsDirectory && !stats.isDirectory()) {
+      console.error(`Error: ${app} path must be a directory: ${overridePath}`);
+      process.exit(1);
+    }
+
+    if (!expectsDirectory && !stats.isFile()) {
+      console.error(`Error: ${app} path must be a file path: ${overridePath}`);
+      process.exit(1);
+    }
   }
 
   let jsonContent: string;
@@ -173,89 +273,63 @@ Examples:
     process.exit(1);
   }
 
-  const data: ColorScheme & Config = JSON.parse(jsonContent);
-  const { applications, ...scheme } = data;
+  const scheme: ColorScheme = JSON.parse(jsonContent);
 
   const hasExplicitFlags = args.some((arg) => appFlags.includes(arg));
-  const configAll = args.includes("--all") || (!hasExplicitFlags && !applications);
-  const shouldConfigure = (flag: string, appFlag?: boolean): boolean =>
-    configAll || args.includes(flag) || (appFlag ?? false);
+  const configAll = args.includes("--all") || !hasExplicitFlags;
+  const shouldConfigure = (flag: string): boolean => configAll || args.includes(flag);
 
   // Editors
   const editorConfigs: Array<[boolean, () => void, string]> = [
-    [shouldConfigure("--vim", applications?.vim ?? false), () => configureVim(scheme), "Vim"],
-    [
-      shouldConfigure("--vscode", applications?.vscode ?? false),
-      () => configureVSCode(scheme),
-      "VSCode",
-    ],
-    [
-      shouldConfigure("--cursor", applications?.cursor ?? false),
-      () => configureCursor(scheme),
-      "Cursor",
-    ],
-    [
-      shouldConfigure("--neovim", applications?.neovim ?? false),
-      () => configureNeovim(scheme),
-      "Neovim",
-    ],
+    [shouldConfigure("--vim"), () => configureVim(scheme, pathOverrides.vim), "Vim"],
+    [shouldConfigure("--vscode"), () => configureVSCode(scheme, pathOverrides.vscode), "VSCode"],
+    [shouldConfigure("--cursor"), () => configureCursor(scheme, pathOverrides.cursor), "Cursor"],
+    [shouldConfigure("--neovim"), () => configureNeovim(scheme, pathOverrides.neovim), "Neovim"],
   ];
 
   // Terminals
   const terminalConfigs: Array<[boolean, () => void, string]> = [
-    [shouldConfigure("--foot", applications?.foot ?? false), () => configureFoot(scheme), "Foot"],
+    [shouldConfigure("--foot"), () => configureFoot(scheme, pathOverrides.foot), "Foot"],
     [
-      shouldConfigure("--alacritty", applications?.alacritty ?? false),
-      () => configureAlacritty(scheme),
+      shouldConfigure("--alacritty"),
+      () => configureAlacritty(scheme, pathOverrides.alacritty),
       "Alacritty",
     ],
+    [shouldConfigure("--kitty"), () => configureKitty(scheme, pathOverrides.kitty), "Kitty"],
     [
-      shouldConfigure("--kitty", applications?.kitty ?? false),
-      () => configureKitty(scheme),
-      "Kitty",
-    ],
-    [
-      shouldConfigure("--wezterm", applications?.wezterm ?? false),
-      () => configureWezTerm(scheme),
+      shouldConfigure("--wezterm"),
+      () => configureWezTerm(scheme, pathOverrides.wezterm),
       "WezTerm",
     ],
     [
-      shouldConfigure("--xresources", applications?.xresources ?? false),
-      () => configureXresources(scheme),
+      shouldConfigure("--xresources"),
+      () => configureXresources(scheme, pathOverrides.xresources),
       "Xresources",
     ],
   ];
 
   // Window Managers
   const windowManagerConfigs: Array<[boolean, () => void, string]> = [
-    [shouldConfigure("--i3", applications?.i3 ?? false), () => configureI3(scheme), "i3"],
-    [shouldConfigure("--sway", applications?.sway ?? false), () => configureSway(scheme), "Sway"],
+    [shouldConfigure("--i3"), () => configureI3(scheme, pathOverrides.i3), "i3"],
+    [shouldConfigure("--sway"), () => configureSway(scheme, pathOverrides.sway), "Sway"],
+    [shouldConfigure("--river"), () => configureRiver(scheme, pathOverrides.river), "River"],
     [
-      shouldConfigure("--river", applications?.river ?? false),
-      () => configureRiver(scheme),
-      "River",
-    ],
-    [
-      shouldConfigure("--hyprland", applications?.hyprland ?? false),
-      () => configureHyprland(scheme),
+      shouldConfigure("--hyprland"),
+      () => configureHyprland(scheme, pathOverrides.hyprland),
       "Hyprland",
     ],
   ];
 
   // GTK
   const gtkConfigs: Array<[boolean, () => void, string]> = [
-    [shouldConfigure("--gtk3", applications?.gtk3 ?? false), () => configureGtk3(scheme), "GTK 3"],
-    [shouldConfigure("--gtk4", applications?.gtk4 ?? false), () => configureGtk4(scheme), "GTK 4"],
+    [shouldConfigure("--gtk3"), () => configureGtk3(scheme, pathOverrides.gtk3), "GTK 3"],
+    [shouldConfigure("--gtk4"), () => configureGtk4(scheme, pathOverrides.gtk4), "GTK 4"],
   ];
 
   // Other
   const otherConfigs: Array<[boolean, () => void, string]> = [
-    [shouldConfigure("--rofi", applications?.rofi ?? false), () => configureRofi(scheme), "Rofi"],
-    [
-      shouldConfigure("--dunst", applications?.dunst ?? false),
-      () => configureDunst(scheme),
-      "Dunst",
-    ],
+    [shouldConfigure("--rofi"), () => configureRofi(scheme, pathOverrides.rofi), "Rofi"],
+    [shouldConfigure("--dunst"), () => configureDunst(scheme, pathOverrides.dunst), "Dunst"],
   ];
 
   const configs = [

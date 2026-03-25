@@ -9,11 +9,11 @@ import {
   type ConfigUpdate,
 } from "../utils";
 
-export function configureWezTerm(scheme: ColorScheme): void {
-  const configDir = join(homedir(), ".config", "wezterm");
-  const colorsDir = join(configDir, "colors");
+export function configureWezTerm(scheme: ColorScheme, configDir?: string): void {
+  const resolvedConfigDir = configDir ?? join(homedir(), ".config", "wezterm");
+  const colorsDir = join(resolvedConfigDir, "colors");
   const schemePath = join(colorsDir, "chromatic.toml");
-  const mainConfigPath = join(configDir, "wezterm.lua");
+  const mainConfigPath = join(resolvedConfigDir, "wezterm.lua");
 
   ensureDir(colorsDir);
 
@@ -52,7 +52,7 @@ brights = [
 
   writeConfigFile(schemePath, toml);
 
-  ensureDir(configDir);
+  ensureDir(resolvedConfigDir);
   let lua = readConfigFile(mainConfigPath);
   const updates: ConfigUpdate[] = [
     {

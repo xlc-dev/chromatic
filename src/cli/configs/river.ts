@@ -1,10 +1,10 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import { execSync } from "child_process";
 import { type ColorScheme } from "../../types";
 import { updateConfigFile, hexToRiverFormat, type ConfigUpdate } from "../utils";
 
-export function configureRiver(scheme: ColorScheme): void {
+export function configureRiver(scheme: ColorScheme, configPath?: string): void {
   const backgroundColor = hexToRiverFormat(scheme.background);
   const focusedColor = hexToRiverFormat(scheme.activeBorder);
   const unfocusedColor = hexToRiverFormat(scheme.inactiveBorder);
@@ -29,8 +29,8 @@ export function configureRiver(scheme: ColorScheme): void {
     },
   ];
 
-  const configDir = join(homedir(), ".config", "river");
-  updateConfigFile(join(configDir, "init"), configDir, updates);
+  const resolvedConfigPath = configPath ?? join(homedir(), ".config", "river", "init");
+  updateConfigFile(resolvedConfigPath, dirname(resolvedConfigPath), updates);
 
   try {
     execSync(`riverctl background-color ${backgroundColor}`, { stdio: "ignore" });

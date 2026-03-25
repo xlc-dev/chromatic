@@ -1,4 +1,4 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { ensureDir, writeConfigFile } from "../utils";
@@ -238,11 +238,10 @@ function buildDefineColorBlock(scheme: ColorScheme): string {
   return lines.join("\n");
 }
 
-export function configureGtk3(scheme: ColorScheme): void {
-  const configDir = join(homedir(), ".config", "gtk-3.0");
-  const cssPath = join(configDir, "gtk.css");
-  ensureDir(configDir);
+export function configureGtk3(scheme: ColorScheme, cssPath?: string): void {
+  const resolvedCssPath = cssPath ?? join(homedir(), ".config", "gtk-3.0", "gtk.css");
+  ensureDir(dirname(resolvedCssPath));
 
   const css = [buildDefineColorBlock(scheme), "", GTK3_CSS].join("\n");
-  writeConfigFile(cssPath, css);
+  writeConfigFile(resolvedCssPath, css);
 }

@@ -1,9 +1,9 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, type ConfigUpdate } from "../utils";
 
-export function configureKitty(scheme: ColorScheme): void {
+export function configureKitty(scheme: ColorScheme, configPath?: string): void {
   const updates: ConfigUpdate[] = [
     { pattern: /^\s*foreground\s+/m, line: `foreground ${scheme.foreground}` },
     { pattern: /^\s*background\s+/m, line: `background ${scheme.background}` },
@@ -26,6 +26,6 @@ export function configureKitty(scheme: ColorScheme): void {
     { pattern: /^\s*color15\s+/m, line: `color15 ${scheme.brightWhite}` },
   ];
 
-  const configDir = join(homedir(), ".config", "kitty");
-  updateConfigFile(join(configDir, "kitty.conf"), configDir, updates);
+  const resolvedConfigPath = configPath ?? join(homedir(), ".config", "kitty", "kitty.conf");
+  updateConfigFile(resolvedConfigPath, dirname(resolvedConfigPath), updates);
 }

@@ -1,13 +1,11 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { ensureDir, writeConfigFile } from "../utils";
 
-export function configureRofi(scheme: ColorScheme): void {
-  const configDir = join(homedir(), ".config", "rofi");
-  const themePath = join(configDir, "chromatic.rasi");
-
-  ensureDir(configDir);
+export function configureRofi(scheme: ColorScheme, themePath?: string): void {
+  const resolvedThemePath = themePath ?? join(homedir(), ".config", "rofi", "chromatic.rasi");
+  ensureDir(dirname(resolvedThemePath));
 
   const rasi = `* {
   background-color: ${scheme.background};
@@ -54,5 +52,5 @@ element alternate selected element-icon {
 }
 `;
 
-  writeConfigFile(themePath, rasi);
+  writeConfigFile(resolvedThemePath, rasi);
 }

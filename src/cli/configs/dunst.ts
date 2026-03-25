@@ -1,4 +1,4 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { readConfigFile, writeConfigFile, ensureDir, updateOrAppendLine } from "../utils";
@@ -36,12 +36,10 @@ function updateSection(
   return config.trimEnd() + newSection;
 }
 
-export function configureDunst(scheme: ColorScheme): void {
-  const configDir = join(homedir(), ".config", "dunst");
-  const configPath = join(configDir, "dunstrc");
-
-  ensureDir(configDir);
-  let config = readConfigFile(configPath);
+export function configureDunst(scheme: ColorScheme, configPath?: string): void {
+  const resolvedConfigPath = configPath ?? join(homedir(), ".config", "dunst", "dunstrc");
+  ensureDir(dirname(resolvedConfigPath));
+  let config = readConfigFile(resolvedConfigPath);
 
   config = updateSection(
     config,
@@ -65,5 +63,5 @@ export function configureDunst(scheme: ColorScheme): void {
     scheme.foreground
   );
 
-  writeConfigFile(configPath, config);
+  writeConfigFile(resolvedConfigPath, config);
 }

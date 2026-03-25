@@ -331,7 +331,8 @@ export function writeTheme(scheme: ColorScheme, extensionDir: string): void {
   writeConfigFile(packageJsonPath, JSON.stringify(packageJson, null, 2));
 }
 
-export function configureVSCode(scheme: ColorScheme): void {
-  const extensionDir = join(homedir(), ".vscode", "extensions", "chromatic-color-theme");
-  writeTheme(scheme, extensionDir);
+export function configureVSCode(scheme: ColorScheme, extensionDir?: string): void {
+  const resolvedExtensionDir =
+    extensionDir ?? join(homedir(), ".vscode", "extensions", "chromatic-color-theme");
+  writeTheme(scheme, resolvedExtensionDir);
 }

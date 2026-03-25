@@ -1,4 +1,4 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import {
@@ -9,12 +9,12 @@ import {
   type ConfigUpdate,
 } from "../utils";
 
-export function configureAlacritty(scheme: ColorScheme): void {
-  const configDir = join(homedir(), ".config", "alacritty");
-  const configPath = join(configDir, "alacritty.toml");
+export function configureAlacritty(scheme: ColorScheme, configPath?: string): void {
+  const resolvedConfigPath =
+    configPath ?? join(homedir(), ".config", "alacritty", "alacritty.toml");
 
-  ensureDir(configDir);
-  let config = readConfigFile(configPath);
+  ensureDir(dirname(resolvedConfigPath));
+  let config = readConfigFile(resolvedConfigPath);
 
   if (!config.includes("[colors]")) config += "\n[colors]\n";
   if (!config.includes("[colors.normal]")) config += "\n[colors.normal]\n";
@@ -84,5 +84,5 @@ export function configureAlacritty(scheme: ColorScheme): void {
     );
   }
 
-  writeConfigFile(configPath, config);
+  writeConfigFile(resolvedConfigPath, config);
 }

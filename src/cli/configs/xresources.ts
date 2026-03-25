@@ -3,7 +3,7 @@ import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, type ConfigUpdate } from "../utils";
 
-export function configureXresources(scheme: ColorScheme): void {
+export function configureXresources(scheme: ColorScheme, configPath?: string): void {
   const updates: ConfigUpdate[] = [
     { pattern: /^\*\.foreground:\s+/m, line: `*.foreground: ${scheme.foreground}` },
     { pattern: /^\*\.background:\s+/m, line: `*.background: ${scheme.background}` },
@@ -26,5 +26,6 @@ export function configureXresources(scheme: ColorScheme): void {
     { pattern: /^\*\.color15:\s+/m, line: `*.color15: ${scheme.brightWhite}` },
   ];
 
-  updateConfigFile(join(homedir(), ".Xresources"), null, updates);
+  const resolvedConfigPath = configPath ?? join(homedir(), ".Xresources");
+  updateConfigFile(resolvedConfigPath, null, updates);
 }

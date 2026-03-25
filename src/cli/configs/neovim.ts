@@ -1,9 +1,9 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, type ConfigUpdate } from "../utils";
 
-export function configureNeovim(scheme: ColorScheme): void {
+export function configureNeovim(scheme: ColorScheme, configPath?: string): void {
   const updates: ConfigUpdate[] = [
     {
       pattern: /^\s*let g:terminal_color_0\s*=/m,
@@ -79,7 +79,6 @@ export function configureNeovim(scheme: ColorScheme): void {
     },
   ];
 
-  const configDir = join(homedir(), ".config", "nvim");
-  const initPath = join(configDir, "init.vim");
-  updateConfigFile(initPath, configDir, updates);
+  const resolvedConfigPath = configPath ?? join(homedir(), ".config", "nvim", "init.vim");
+  updateConfigFile(resolvedConfigPath, dirname(resolvedConfigPath), updates);
 }

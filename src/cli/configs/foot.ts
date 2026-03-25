@@ -1,4 +1,4 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { readConfigFile, writeConfigFile, ensureDir, stripHash } from "../utils";
@@ -24,11 +24,9 @@ type FootColorKey =
   | "bright6"
   | "bright7";
 
-export function configureFoot(scheme: ColorScheme): void {
-  const footConfigDir = join(homedir(), ".config", "foot");
-  const footConfigPath = join(footConfigDir, "foot.ini");
-
-  ensureDir(footConfigDir);
+export function configureFoot(scheme: ColorScheme, configPath?: string): void {
+  const footConfigPath = configPath ?? join(homedir(), ".config", "foot", "foot.ini");
+  ensureDir(dirname(footConfigPath));
 
   const colorMap: Record<FootColorKey, string> = {
     background: stripHash(scheme.background),

@@ -1,4 +1,4 @@
-import { join } from "path";
+import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, stripHash, type ConfigUpdate } from "../utils";
@@ -8,7 +8,7 @@ function toRgba(hex: string): string {
   return `rgba(${clean}ff)`;
 }
 
-export function configureHyprland(scheme: ColorScheme): void {
+export function configureHyprland(scheme: ColorScheme, configPath?: string): void {
   const activeBorder = toRgba(scheme.activeBorder);
   const inactiveBorder = toRgba(scheme.inactiveBorder);
   const urgentBorder = toRgba(scheme.urgentBorder);
@@ -28,7 +28,6 @@ export function configureHyprland(scheme: ColorScheme): void {
     },
   ];
 
-  const configDir = join(homedir(), ".config", "hypr");
-  const configPath = join(configDir, "hyprland.conf");
-  updateConfigFile(configPath, configDir, updates);
+  const resolvedConfigPath = configPath ?? join(homedir(), ".config", "hypr", "hyprland.conf");
+  updateConfigFile(resolvedConfigPath, dirname(resolvedConfigPath), updates);
 }
