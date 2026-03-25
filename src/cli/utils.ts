@@ -19,25 +19,36 @@ export function writeConfigFile(filePath: string, content: string): void {
   writeFileSync(filePath, content, "utf-8");
 }
 
+function isIniStyleCommentLine(line: string): boolean {
+  const t = line.trimStart();
+  return t.startsWith("#") || t.startsWith(";");
+}
+
 export function updateOrAppendLine(content: string, linePattern: RegExp, newLine: string): string {
   const lines = content.split("\n");
-  let found = false;
+  const matchingIndices: number[] = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line && linePattern.test(line)) {
-      lines[i] = newLine;
-      found = true;
-      break;
+    if (line === undefined || isIniStyleCommentLine(line)) {
+      continue;
+    }
+    if (linePattern.test(line)) {
+      matchingIndices.push(i);
     }
   }
 
-  if (!found) {
-    const trimmed = content.trimEnd();
-    return trimmed + (trimmed ? "\n" : "") + newLine + "\n";
+  if (matchingIndices.length > 0) {
+    const firstIdx = matchingIndices[0]!;
+    lines[firstIdx] = newLine;
+    for (let j = matchingIndices.length - 1; j >= 1; j--) {
+      lines.splice(matchingIndices[j]!, 1);
+    }
+    return lines.join("\n");
   }
 
-  return lines.join("\n");
+  const trimmed = content.trimEnd();
+  return trimmed + (trimmed ? "\n" : "") + newLine + "\n";
 }
 
 export function updateConfigFile(
@@ -70,8 +81,7 @@ export function updateNamedSection(
 ): string {
   const escapedSectionName = sectionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const sectionRegex = new RegExp(
-    `(\\[${escapedSectionName}\\]\\s*\\n?)([\\s\\S]*?)(?=\\n\\[|$)`,
-    "m"
+    `(\\[${escapedSectionName}\\]\\s*\\n?)([\\s\\S]*?)(?=\\n\\[|$)`
   );
   const match = content.match(sectionRegex);
   let sectionBody = match?.[2] ?? "";
