@@ -1,4 +1,4 @@
-import { join } from "path";
+import { basename, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import {
@@ -10,7 +10,9 @@ import {
 } from "../utils";
 
 export function configureWezTerm(scheme: ColorScheme, configDir?: string): void {
-  const resolvedConfigDir = configDir ?? join(homedir(), ".config", "wezterm");
+  const dirName = "wezterm";
+  const baseDir = configDir ?? join(homedir(), ".config");
+  const resolvedConfigDir = basename(baseDir) === dirName ? baseDir : join(baseDir, dirName);
   const colorsDir = join(resolvedConfigDir, "colors");
   const schemePath = join(colorsDir, "chromatic.toml");
   const mainConfigPath = join(resolvedConfigDir, "wezterm.lua");

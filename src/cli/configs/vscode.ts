@@ -1,4 +1,4 @@
-import { join } from "path";
+import { basename, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { ensureDir, writeConfigFile } from "../utils";
@@ -332,7 +332,9 @@ export function writeTheme(scheme: ColorScheme, extensionDir: string): void {
 }
 
 export function configureVSCode(scheme: ColorScheme, extensionDir?: string): void {
+  const themeDirName = "chromatic-color-theme";
+  const baseDir = extensionDir ?? join(homedir(), ".vscode", "extensions");
   const resolvedExtensionDir =
-    extensionDir ?? join(homedir(), ".vscode", "extensions", "chromatic-color-theme");
+    basename(baseDir) === themeDirName ? baseDir : join(baseDir, themeDirName);
   writeTheme(scheme, resolvedExtensionDir);
 }
