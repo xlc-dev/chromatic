@@ -30,7 +30,7 @@ export function calculateBrightness(color: RGB): number {
   return 0.2126 * rLinear + 0.7152 * gLinear + 0.0722 * bLinear;
 }
 
-export function kMeansClustering(pixels: RGB[], k: number, maxIterations: number = 20): RGB[] {
+function kMeansClustering(pixels: RGB[], k: number, maxIterations: number = 20): RGB[] {
   if (pixels.length === 0) return [];
   if (k >= pixels.length) return pixels;
 
@@ -103,7 +103,7 @@ export function kMeansClustering(pixels: RGB[], k: number, maxIterations: number
   return centroids;
 }
 
-export function getImagePixels(imageData: ImageData): RGB[] {
+function getImagePixels(imageData: ImageData): RGB[] {
   const pixels: RGB[] = [];
   const data = imageData.data;
 
