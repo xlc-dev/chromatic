@@ -1,39 +1,24 @@
 import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
-import { readConfigFile, writeConfigFile, ensureDir, updateOrAppendLine } from "../utils";
+import {
+  readConfigFile,
+  writeConfigFile,
+  ensureDir,
+  updateNamedSection,
+  type ConfigUpdate,
+} from "../utils";
 
-function updateSection(
-  config: string,
-  sectionName: string,
+function updatesForUrgency(
   frameColor: string,
   background: string,
   foreground: string
-): string {
-  const sectionRegex = new RegExp(`(\\[${sectionName}\\])([\\s\\S]*?)(?=\\n\\[|$)`, "m");
-  const match = config.match(sectionRegex);
-  let sectionContent: string;
-  if (match && match[2]) {
-    sectionContent = match[2];
-    sectionContent = updateOrAppendLine(
-      sectionContent,
-      /^\s*frame_color\s*=\s*[^\n]+/m,
-      `frame_color = "${frameColor}"`
-    );
-    sectionContent = updateOrAppendLine(
-      sectionContent,
-      /^\s*background\s*=\s*[^\n]+/m,
-      `background = "${background}"`
-    );
-    sectionContent = updateOrAppendLine(
-      sectionContent,
-      /^\s*foreground\s*=\s*[^\n]+/m,
-      `foreground = "${foreground}"`
-    );
-    return config.replace(sectionRegex, match[1] + sectionContent);
-  }
-  const newSection = `\n[${sectionName}]\nframe_color = "${frameColor}"\nbackground = "${background}"\nforeground = "${foreground}"\n`;
-  return config.trimEnd() + newSection;
+): ConfigUpdate[] {
+  return [
+    { pattern: /^\s*frame_color\s*=\s*[^\n]+/m, line: `frame_color = "${frameColor}"` },
+    { pattern: /^\s*background\s*=\s*[^\n]+/m, line: `background = "${background}"` },
+    { pattern: /^\s*foreground\s*=\s*[^\n]+/m, line: `foreground = "${foreground}"` },
+  ];
 }
 
 export function configureDunst(scheme: ColorScheme, configPath?: string): void {
@@ -41,26 +26,20 @@ export function configureDunst(scheme: ColorScheme, configPath?: string): void {
   ensureDir(dirname(resolvedConfigPath));
   let config = readConfigFile(resolvedConfigPath);
 
-  config = updateSection(
+  config = updateNamedSection(
     config,
     "urgency_low",
-    scheme.inactiveBorder,
-    scheme.background,
-    scheme.foreground
+    updatesForUrgency(scheme.inactiveBorder, scheme.background, scheme.foreground)
   );
-  config = updateSection(
+  config = updateNamedSection(
     config,
     "urgency_normal",
-    scheme.activeBorder,
-    scheme.background,
-    scheme.foreground
+    updatesForUrgency(scheme.activeBorder, scheme.background, scheme.foreground)
   );
-  config = updateSection(
+  config = updateNamedSection(
     config,
     "urgency_critical",
-    scheme.urgentBorder,
-    scheme.background,
-    scheme.foreground
+    updatesForUrgency(scheme.urgentBorder, scheme.background, scheme.foreground)
   );
 
   writeConfigFile(resolvedConfigPath, config);

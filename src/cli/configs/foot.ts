@@ -1,7 +1,14 @@
 import { dirname, join } from "path";
 import { homedir } from "os";
 import type { ColorScheme } from "../../types";
-import { readConfigFile, writeConfigFile, ensureDir, stripHash } from "../utils";
+import {
+  readConfigFile,
+  writeConfigFile,
+  ensureDir,
+  stripHash,
+  updateNamedSection,
+  type ConfigUpdate,
+} from "../utils";
 
 type FootColorKey =
   | "background"
@@ -51,65 +58,11 @@ export function configureFoot(scheme: ColorScheme, configPath?: string): void {
   };
 
   let footConfig = readConfigFile(footConfigPath);
-  if (footConfig) {
-    footConfig = footConfig.replace(
-      /(\[(?:colors|colors-dark)\][^\n]*\n)([\s\S]*?)(?=\n\[|$)/g,
-      (_match, _header, sectionContent) => {
-        const lines = sectionContent.split("\n");
-        const updatedLines = lines.map((line: string) => {
-          const trimmed = line.trim();
-          if (trimmed.startsWith("#") || trimmed === "") {
-            return line;
-          }
-          const keyMatch = trimmed.match(/^([^=]+)=(.+)$/);
-          if (keyMatch && keyMatch[1]) {
-            const key = keyMatch[1].trim() as FootColorKey;
-            if (key in colorMap) {
-              return `${key}=${colorMap[key]}`;
-            }
-          }
-          return line;
-        });
-
-        const existingKeys = new Set(
-          lines
-            .map((line: string) => {
-              const trimmed = line.trim();
-              if (trimmed.startsWith("#") || trimmed === "") return null;
-              const keyMatch = trimmed.match(/^([^=]+)=/);
-              return keyMatch && keyMatch[1] ? keyMatch[1].trim() : null;
-            })
-            .filter((key: string | null): key is FootColorKey => key !== null && key in colorMap)
-        );
-
-        const missingKeys = Object.keys(colorMap).filter(
-          (key): key is FootColorKey => !existingKeys.has(key as FootColorKey)
-        );
-        const additions =
-          missingKeys.length > 0
-            ? "\n" + missingKeys.map((key: FootColorKey) => `${key}=${colorMap[key]}`).join("\n")
-            : "";
-
-        return `[colors-dark]\n` + updatedLines.join("\n") + additions;
-      }
-    );
-
-    if (!footConfig.includes("[colors-dark]")) {
-      const colorsConfig = `[colors-dark]
-${Object.entries(colorMap)
-  .map(([key, value]) => `${key}=${value}`)
-  .join("\n")}
-`;
-      footConfig = footConfig + "\n" + colorsConfig;
-    }
-  } else {
-    const colorsConfig = `[colors-dark]
-${Object.entries(colorMap)
-  .map(([key, value]) => `${key}=${value}`)
-  .join("\n")}
-`;
-    footConfig = colorsConfig;
-  }
+  const updates: ConfigUpdate[] = Object.entries(colorMap).map(([key, value]) => ({
+    pattern: new RegExp(`^\\s*${key}\\s*=\\s*.+$`, "m"),
+    line: `${key}=${value}`,
+  }));
+  footConfig = updateNamedSection(footConfig, "colors-dark", updates);
 
   writeConfigFile(footConfigPath, footConfig);
 }

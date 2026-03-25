@@ -63,6 +63,31 @@ export function updateConfigFile(
   writeConfigFile(configPath, content);
 }
 
+export function updateNamedSection(
+  content: string,
+  sectionName: string,
+  updates: ConfigUpdate[]
+): string {
+  const escapedSectionName = sectionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const sectionRegex = new RegExp(
+    `(\\[${escapedSectionName}\\]\\s*\\n?)([\\s\\S]*?)(?=\\n\\[|$)`,
+    "m"
+  );
+  const match = content.match(sectionRegex);
+  let sectionBody = match?.[2] ?? "";
+
+  for (const { pattern, line } of updates) {
+    sectionBody = updateOrAppendLine(sectionBody, pattern, line);
+  }
+
+  if (match) {
+    return content.replace(sectionRegex, `${match[1]}${sectionBody}`);
+  }
+
+  const section = `[${sectionName}]\n${sectionBody.trimEnd()}${sectionBody.trimEnd() ? "\n" : ""}`;
+  return `${content.trimEnd()}${content.trimEnd() ? "\n\n" : ""}${section}\n`;
+}
+
 export function stripHash(hex: string): string {
   return hex.startsWith("#") ? hex.slice(1) : hex;
 }
