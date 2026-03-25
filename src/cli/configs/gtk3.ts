@@ -24,10 +24,16 @@ window.csd titlebar, window.csd .titlebar, .csd titlebar, .csd .titlebar {
 }
 
 headerbar:backdrop, titlebar:backdrop, window.csd titlebar:backdrop, window.csd .titlebar:backdrop, .csd titlebar:backdrop, .csd .titlebar:backdrop {
-  color: @headerbar_fg_color !important;
+  color: @insensitive_fg_color !important;
   background-color: @headerbar_bg_color !important;
   border-color: @border_color !important;
   background-image: none !important;
+}
+
+headerbar:backdrop .title, headerbar:backdrop .subtitle, titlebar:backdrop .title, titlebar:backdrop .subtitle,
+window.csd titlebar:backdrop .title, window.csd titlebar:backdrop .subtitle, window.csd .titlebar:backdrop .title, window.csd .titlebar:backdrop .subtitle,
+.csd titlebar:backdrop .title, .csd titlebar:backdrop .subtitle, .csd .titlebar:backdrop .title, .csd .titlebar:backdrop .subtitle {
+  color: @insensitive_fg_color !important;
 }
 
 headerbar button, titlebar button, window.csd titlebar button, .csd titlebar button, button.titlebutton {
@@ -49,7 +55,7 @@ headerbar button:active, headerbar button:checked, titlebar button:active, title
 }
 
 headerbar button:backdrop, titlebar button:backdrop, button.titlebutton:backdrop {
-  color: @headerbar_fg_color;
+  color: @insensitive_fg_color;
   background-color: @headerbar_bg_color;
   border-color: @border_color;
   background-image: none;
@@ -139,6 +145,14 @@ dialog headerbar, messagedialog headerbar, .message-dialog headerbar {
   color: @headerbar_fg_color;
   background-color: @headerbar_bg_color;
   border-color: @border_color;
+}
+
+dialog:backdrop, messagedialog:backdrop, .message-dialog:backdrop {
+  color: @insensitive_fg_color;
+}
+
+dialog:backdrop headerbar, messagedialog:backdrop headerbar, .message-dialog:backdrop headerbar {
+  color: @insensitive_fg_color !important;
 }
 
 dialog #action_area button, dialog .dialog-action-area button, dialog action-area button, dialog box button,

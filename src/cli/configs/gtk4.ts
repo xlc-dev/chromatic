@@ -35,14 +35,18 @@ headerbar button:active, headerbar button:checked, windowcontrols button:active,
 }
 
 headerbar:backdrop, .titlebar:backdrop {
-  color: @headerbar_fg_color !important;
+  color: @insensitive_fg_color !important;
   background-color: @headerbar_bg_color !important;
   border-color: @border_color !important;
   background-image: none !important;
 }
 
+headerbar:backdrop .title, headerbar:backdrop .subtitle, .titlebar:backdrop .title, .titlebar:backdrop .subtitle {
+  color: @insensitive_fg_color !important;
+}
+
 headerbar button:backdrop, windowcontrols button:backdrop, .titlebar button:backdrop {
-  color: @headerbar_fg_color;
+  color: @insensitive_fg_color;
   background-color: @headerbar_bg_color;
   border-color: @border_color;
   background-image: none;
@@ -131,6 +135,14 @@ dialog headerbar {
   color: @headerbar_fg_color;
   background-color: @headerbar_bg_color;
   border-color: @border_color;
+}
+
+dialog:backdrop {
+  color: @insensitive_fg_color;
+}
+
+dialog:backdrop headerbar, dialog:backdrop .title, dialog:backdrop .subtitle {
+  color: @insensitive_fg_color !important;
 }
 
 dialog button, dialog .dialog-action-area button, dialog actionbar button {
