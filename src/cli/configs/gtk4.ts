@@ -3,601 +3,222 @@ import { homedir } from "os";
 import type { ColorScheme } from "../../types";
 import { ensureDir, writeConfigFile } from "../utils";
 
-const GTK4_THEME_CSS = `
-* {
-  outline-width: 0;
-  -gtk-secondary-caret-color: @theme_selected_bg;
-}
-
-window {
-  color: @theme_fg;
-  background-color: @theme_bg;
-}
-
-window:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
-}
-
-label {
-  color: @theme_fg;
-  caret-color: currentColor;
-}
-
-label:disabled {
-  color: @theme_insensitive_fg;
-}
-
-label:disabled:backdrop {
-  color: @theme_insensitive_fg;
-}
-
-label selection {
-  background-color: @theme_selected_bg;
-  color: @theme_fg;
-}
-
-entry {
-  color: @theme_fg;
-  caret-color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-entry:focus {
-  border-color: @theme_selected_bg;
-}
-
-entry:disabled {
-  color: @theme_insensitive_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg_insensitive;
-}
-
-entry:backdrop {
-  color: @theme_backdrop_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-entry:backdrop:disabled {
-  color: @theme_insensitive_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg_insensitive;
-}
-
-entry.error {
-  color: @theme_error;
-  border-color: @theme_error;
-}
-
-entry.error:focus {
-  border-color: @theme_error;
-}
-
-entry.warning {
-  color: @theme_warning;
-  border-color: @theme_warning;
-}
-
-entry.warning:focus {
-  border-color: @theme_warning;
-}
-
-entry progress {
-  border-color: @theme_selected_bg;
-}
-
-button {
-  color: @theme_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-button:hover {
-  color: @theme_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_border;
-  background-color: @theme_bg_hover;
-}
-
-button:active, button:checked {
-  color: @theme_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_border;
-  background-color: @theme_bg_active;
-}
-
-button:backdrop {
-  color: @theme_backdrop_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-button:backdrop:active, button:backdrop:checked {
-  color: @theme_backdrop_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_border;
-  background-color: @theme_bg_active;
-}
-
-button:disabled {
-  color: @theme_insensitive_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_border;
-  background-color: @theme_bg_insensitive;
-}
-
-button.flat {
-  border-color: transparent;
-  background-color: transparent;
-}
-
-button.flat:hover {
-  background-color: @theme_bg_hover;
-}
-
-button.flat:active, button.flat:checked {
-  background-color: @theme_bg_active;
-}
-
-button.flat:backdrop, button.flat:disabled {
-  border-color: transparent;
-  background-color: transparent;
-}
-
-button.suggested-action {
-  color: @theme_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_selected_bg;
-  background-color: @theme_selected_bg;
-}
-
-button.suggested-action:hover {
-  color: @theme_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_selected_bg;
-  background-color: shade(@theme_selected_bg, 1.05);
-}
-
-button.suggested-action:active, button.suggested-action:checked {
-  color: @theme_fg;
-  border-color: @theme_selected_bg;
-  background-color: shade(@theme_selected_bg, 0.95);
-}
-
-button.suggested-action:backdrop {
-  color: @theme_backdrop_fg;
-  border-color: @theme_selected_bg;
-  background-color: @theme_selected_bg;
-}
-
-button.destructive-action {
-  color: @theme_fg;
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_error;
-  background-color: @theme_error;
-}
-
-button.destructive-action:hover {
-  border-width: 1px;
-  border-style: solid;
-  border-color: @theme_error;
-  background-color: shade(@theme_error, 1.1);
-}
-
-scale trough {
-  background-color: @theme_border;
-  border-color: @theme_border;
-}
-
-scale highlight {
-  background-color: @theme_selected_bg;
-}
-
-scale slider {
-  color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-scale slider:hover {
-  background-color: @theme_bg_hover;
-}
-
-scale slider:active {
-  background-color: @theme_bg_active;
-}
-
-scale slider:disabled {
-  color: @theme_insensitive_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg_insensitive;
-}
-
-scale slider:backdrop {
-  color: @theme_backdrop_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-scrollbar trough {
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-scrollbar slider {
-  background-color: @theme_bg_hover;
-  border-color: @theme_border;
-}
-
-scrollbar slider:hover {
-  background-color: @theme_backdrop_fg;
-}
-
-scrollbar slider:active {
-  background-color: @theme_fg;
-}
-
-scrollbar slider:backdrop {
-  background-color: @theme_border;
-}
-
-scrollbar slider:disabled {
-  background-color: @theme_bg_insensitive;
-}
-
-checkbutton check, checkbutton radio {
-  color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-checkbutton check:hover, checkbutton radio:hover {
-  background-color: @theme_bg_hover;
-}
-
-checkbutton check:active, checkbutton radio:active, checkbutton check:checked, checkbutton radio:checked {
-  background-color: @theme_selected_bg;
-  border-color: @theme_selected_bg;
-  color: @theme_fg;
-}
-
-checkbutton check:disabled, checkbutton radio:disabled {
-  color: @theme_insensitive_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg_insensitive;
-}
-
-checkbutton check:backdrop, checkbutton radio:backdrop {
-  color: @theme_backdrop_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-checkbutton check:backdrop:checked, checkbutton radio:backdrop:checked {
-  background-color: @theme_selected_bg;
-  border-color: @theme_selected_bg;
-  color: @theme_backdrop_fg;
-}
-
-switch {
-  background-color: @theme_border;
-}
-
-switch:checked {
-  background-color: @theme_selected_bg;
-}
-
-switch slider {
-  color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-switch slider:hover {
-  background-color: @theme_bg_hover;
-}
-
-switch slider:active {
-  background-color: @theme_bg_active;
-}
-
-switch:backdrop slider {
-  color: @theme_backdrop_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-switch:backdrop:checked {
-  background-color: @theme_selected_bg;
-}
-
-menu {
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-menuitem {
-  color: @theme_fg;
-  background-color: transparent;
-}
-
-menuitem:hover {
-  color: @theme_fg;
-  background-color: @theme_bg_hover;
-}
-
-menuitem:disabled {
-  color: @theme_insensitive_fg;
-}
-
-menu menuitem:backdrop {
-  color: @theme_backdrop_fg;
-}
-
-tooltip {
-  color: @theme_fg;
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-tooltip label {
-  color: @theme_fg;
-}
-
-notebook {
-  background-color: @theme_bg;
-}
-
-notebook header {
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-notebook tab {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-notebook tab:checked {
-  color: @theme_fg;
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-notebook tab:hover {
-  color: @theme_fg;
-  background-color: @theme_bg_hover;
+const GTK4_CSS = `
+window, .background {
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
 }
 
 headerbar {
-  color: @theme_fg;
-  background-color: @theme_bg;
-  border-color: @theme_border;
+  color: @headerbar_fg_color;
+  background-color: @headerbar_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
-headerbar:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
-  border-color: @theme_border;
+headerbar button, windowcontrols button, .titlebar button {
+  color: @headerbar_fg_color;
+  background-color: @headerbar_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
-headerbar button {
-  color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
+headerbar button:hover, windowcontrols button:hover, .titlebar button:hover {
+  background-color: @hover_bg_color;
+  background-image: none;
 }
 
-headerbar button:hover {
-  background-color: @theme_bg_hover;
+headerbar button:active, headerbar button:checked, windowcontrols button:active, .titlebar button:active {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
 }
 
-headerbar button:active, headerbar button:checked {
-  background-color: @theme_bg_active;
+headerbar:backdrop, .titlebar:backdrop {
+  color: @headerbar_fg_color !important;
+  background-color: @headerbar_bg_color !important;
+  border-color: @border_color !important;
+  background-image: none !important;
 }
 
-headerbar button.flat {
-  background-color: @theme_bg;
-  border-color: @theme_border;
+headerbar button:backdrop, windowcontrols button:backdrop, .titlebar button:backdrop {
+  color: @headerbar_fg_color;
+  background-color: @headerbar_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
-headerbar button.flat:hover {
-  background-color: @theme_bg_hover;
+entry, textview, listview, row, .view {
+  color: @theme_text_color;
+  background-color: @theme_base_color;
+  border-color: @border_color;
 }
 
-headerbar button.suggested-action {
-  background-color: @theme_selected_bg;
-  border-color: @theme_selected_bg;
-  color: @theme_fg;
+button, combobox, dropdown, spinbutton, scale slider, checkbutton check, checkbutton radio {
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
+  border-color: @border_color;
 }
 
-headerbar button.suggested-action:hover {
-  background-color: shade(@theme_selected_bg, 1.05);
+button:hover, combobox:hover, dropdown:hover {
+  background-color: @hover_bg_color;
+  background-image: none;
 }
 
-headerbar button:backdrop {
-  color: @theme_backdrop_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
+button:active, button:checked, combobox:active, dropdown:active {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
 }
 
-headerbar button.suggested-action:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_selected_bg;
+button:focus, combobox:focus, dropdown:focus, entry:focus, spinbutton:focus {
+  border-color: @accent_bg_color;
 }
 
-progressbar {
-  background-color: @theme_border;
+.path-bar, .breadcrumbs {
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
-progressbar progress {
-  background-color: @theme_selected_bg;
+.path-bar button, .breadcrumbs button {
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
-progressbar trough {
-  background-color: @theme_border;
+.path-bar button:hover, .breadcrumbs button:hover {
+  background-color: @hover_bg_color;
+  background-image: none;
 }
 
-listview, listview view, row {
-  color: @theme_fg;
-  background-color: @theme_bg;
+.path-bar button:active, .path-bar button:checked, .breadcrumbs button:active, .breadcrumbs button:checked {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
 }
 
-listview:backdrop, listview view:backdrop, row:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
+selection, *:selected {
+  color: @theme_selected_fg_color;
+  background-color: mix(@theme_selected_bg_color, @theme_bg_color, 0.2);
 }
 
-row:selected, row:selected:hover {
-  color: @theme_fg;
-  background-color: @theme_selected_bg;
+row:selected, row:selected:hover, listview row:selected, listview row:selected:hover {
+  color: @theme_selected_fg_color;
+  background-color: @accent_bg_color;
 }
 
-row:selected:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_selected_bg;
+row:selected:backdrop, listview row:selected:backdrop {
+  color: @theme_selected_fg_color;
+  background-color: mix(@accent_bg_color, @theme_bg_color, 0.35);
 }
 
-row:hover {
-  background-color: @theme_bg_hover;
-}
-
-separator {
-  background-color: @theme_border;
-}
-
-frame {
-  border-color: @theme_border;
-}
-
-frame > border {
-  border-color: @theme_border;
-}
-
-popover {
-  background-color: @theme_bg;
-  border-color: @theme_border;
-}
-
-popover:backdrop {
-  background-color: @theme_bg;
-  border-color: @theme_border;
+popover, menu, tooltip {
+  color: @popover_fg_color;
+  background-color: @popover_bg_color;
+  border-color: @border_color;
 }
 
 dialog {
-  background-color: @theme_bg;
-  border-color: @theme_border;
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
+  border-color: @border_color;
 }
 
-dialog:backdrop {
-  background-color: @theme_bg;
-  border-color: @theme_border;
+dialog headerbar {
+  color: @headerbar_fg_color;
+  background-color: @headerbar_bg_color;
+  border-color: @border_color;
 }
 
-expander-widget {
-  color: @theme_fg;
-  background-color: transparent;
+dialog button, dialog .dialog-action-area button, dialog actionbar button {
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
-expander-widget:hover {
-  color: @theme_fg;
-  background-color: @theme_bg_hover;
+dialog button:hover, dialog .dialog-action-area button:hover, dialog actionbar button:hover {
+  background-color: @hover_bg_color;
+  background-image: none;
 }
 
-expander-widget:backdrop {
-  color: @theme_backdrop_fg;
+dialog button:active, dialog button:checked, dialog .dialog-action-area button:active, dialog .dialog-action-area button:checked, dialog actionbar button:active, dialog actionbar button:checked {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
+  background-image: none;
 }
 
-textview {
-  color: @theme_fg;
-  caret-color: @theme_fg;
-  background-color: @theme_bg;
+dialog button.suggested-action, dialog .dialog-action-area button.suggested-action, dialog actionbar button.suggested-action {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
+  background-image: none;
 }
 
-textview:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
+dialog button.suggested-action:active, dialog button.suggested-action:checked,
+dialog .dialog-action-area button.suggested-action:active, dialog .dialog-action-area button.suggested-action:checked,
+dialog actionbar button.suggested-action:active, dialog actionbar button.suggested-action:checked,
+dialog button:default:active, dialog button:default:checked,
+dialog .dialog-action-area button:default:active, dialog .dialog-action-area button:default:checked,
+dialog actionbar button:default:active, dialog actionbar button:default:checked {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
+  background-image: none;
 }
 
-textview:disabled {
-  color: @theme_insensitive_fg;
-  background-color: @theme_bg_insensitive;
-}
-
-rubberband {
-  border-color: @theme_selected_bg;
-  background-color: alpha(@theme_selected_bg, 0.2);
-}
-
-combobox {
-  color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-combobox:hover {
-  background-color: @theme_bg_hover;
-}
-
-combobox:disabled {
-  color: @theme_insensitive_fg;
-  background-color: @theme_bg_insensitive;
-}
-
-combobox:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
-}
-
-dropdown {
-  color: @theme_fg;
-  border-color: @theme_border;
-  background-color: @theme_bg;
-}
-
-dropdown:hover {
-  background-color: @theme_bg_hover;
-}
-
-dropdown:disabled {
-  color: @theme_insensitive_fg;
-  background-color: @theme_bg_insensitive;
-}
-
-dropdown:backdrop {
-  color: @theme_backdrop_fg;
-  background-color: @theme_bg;
+progressbar progress, scale highlight, switch:checked {
+  background-color: @accent_bg_color;
 }
 `.trim();
 
 function buildDefineColorBlock(scheme: ColorScheme): string {
   const lines: string[] = [
-    `@define-color theme_bg ${scheme.background};`,
-    `@define-color theme_fg ${scheme.foreground};`,
-    `@define-color theme_selected_bg ${scheme.activeBorder};`,
-    `@define-color theme_border ${scheme.inactiveBorder};`,
-    `@define-color theme_error ${scheme.urgentBorder};`,
-    `@define-color theme_warning ${scheme.yellow};`,
-    `@define-color theme_success ${scheme.green};`,
-    "@define-color theme_insensitive_fg mix(@theme_fg, @theme_bg, 0.5);",
-    "@define-color theme_backdrop_fg mix(@theme_fg, @theme_bg, 0.7);",
-    "@define-color theme_bg_hover shade(@theme_bg, 1.06);",
-    "@define-color theme_bg_active shade(@theme_bg, 0.94);",
-    "@define-color theme_bg_insensitive shade(@theme_bg, 0.98);",
+    `@define-color theme_bg_color ${scheme.background};`,
+    `@define-color theme_fg_color ${scheme.foreground};`,
+    `@define-color theme_base_color ${scheme.background};`,
+    `@define-color theme_text_color ${scheme.foreground};`,
+    `@define-color theme_selected_bg_color ${scheme.activeBorder};`,
+    `@define-color theme_selected_fg_color ${scheme.foreground};`,
+    `@define-color bg_color ${scheme.background};`,
+    `@define-color fg_color ${scheme.foreground};`,
+    `@define-color base_color ${scheme.background};`,
+    `@define-color text_color ${scheme.foreground};`,
+    `@define-color selected_bg_color ${scheme.activeBorder};`,
+    `@define-color selected_fg_color ${scheme.foreground};`,
+    `@define-color accent_bg_color ${scheme.activeBorder};`,
+    `@define-color accent_fg_color ${scheme.foreground};`,
+    `@define-color accent_color ${scheme.activeBorder};`,
+    `@define-color window_bg_color ${scheme.background};`,
+    `@define-color window_fg_color ${scheme.foreground};`,
+    `@define-color view_bg_color ${scheme.background};`,
+    `@define-color view_fg_color ${scheme.foreground};`,
+    `@define-color headerbar_bg_color ${scheme.background};`,
+    `@define-color headerbar_fg_color ${scheme.foreground};`,
+    `@define-color popover_bg_color ${scheme.background};`,
+    `@define-color popover_fg_color ${scheme.foreground};`,
+    `@define-color card_bg_color shade(${scheme.background}, 1.03);`,
+    `@define-color sidebar_bg_color shade(${scheme.background}, 0.97);`,
+    `@define-color sidebar_fg_color ${scheme.foreground};`,
+    `@define-color insensitive_bg_color shade(${scheme.background}, 0.98);`,
+    `@define-color insensitive_fg_color mix(${scheme.foreground}, ${scheme.background}, 0.5);`,
+    `@define-color insensitive_base_color shade(${scheme.background}, 0.98);`,
+    `@define-color hover_bg_color mix(${scheme.inactiveBorder}, ${scheme.background}, 0.07);`,
+    `@define-color hover_border_color ${scheme.inactiveBorder};`,
+    `@define-color border_color ${scheme.inactiveBorder};`,
+    `@define-color borders ${scheme.inactiveBorder};`,
+    `@define-color warning_color ${scheme.yellow};`,
+    `@define-color error_color ${scheme.urgentBorder};`,
+    `@define-color success_color ${scheme.green};`,
+    `@define-color destructive_color ${scheme.urgentBorder};`,
+    `@define-color link_color ${scheme.activeBorder};`,
+    `@define-color visited_link_color shade(${scheme.activeBorder}, 0.9);`,
   ];
+
   return lines.join("\n");
 }
 
@@ -606,6 +227,6 @@ export function configureGtk4(scheme: ColorScheme): void {
   const cssPath = join(configDir, "gtk.css");
   ensureDir(configDir);
 
-  const css = [buildDefineColorBlock(scheme), "", GTK4_THEME_CSS].join("\n");
+  const css = [buildDefineColorBlock(scheme), "", GTK4_CSS].join("\n");
   writeConfigFile(cssPath, css);
 }
