@@ -794,14 +794,3 @@ export function highlightSyntax(code: string, language: Language): CodeToken[] {
 
   return tokens;
 }
-
-export function tokenizeCodeExample(
-  code: string,
-  language: Language
-): { content: string; tokens: CodeToken[] } {
-  const tokens = highlightSyntax(code, language);
-  return {
-    content: code,
-    tokens,
-  };
-}
