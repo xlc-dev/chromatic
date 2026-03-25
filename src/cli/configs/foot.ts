@@ -13,7 +13,6 @@ import {
 type FootColorKey =
   | "background"
   | "foreground"
-  | "cursor"
   | "regular0"
   | "regular1"
   | "regular2"
@@ -38,7 +37,6 @@ export function configureFoot(scheme: ColorScheme, configPath?: string): void {
   const colorMap: Record<FootColorKey, string> = {
     background: stripHash(scheme.background),
     foreground: stripHash(scheme.foreground),
-    cursor: `${stripHash(scheme.background)} ${stripHash(scheme.foreground)}`,
     regular0: stripHash(scheme.black),
     regular1: stripHash(scheme.red),
     regular2: stripHash(scheme.green),
