@@ -80,9 +80,7 @@ export function updateNamedSection(
   updates: ConfigUpdate[]
 ): string {
   const escapedSectionName = sectionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const sectionRegex = new RegExp(
-    `(\\[${escapedSectionName}\\]\\s*\\n?)([\\s\\S]*?)(?=\\n\\[|$)`
-  );
+  const sectionRegex = new RegExp(`(\\[${escapedSectionName}\\]\\s*\\n?)([\\s\\S]*?)(?=\\n\\[|$)`);
   const match = content.match(sectionRegex);
   let sectionBody = match?.[2] ?? "";
 
