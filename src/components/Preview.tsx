@@ -327,7 +327,7 @@ export default function Preview(props: PreviewProps) {
           <WindowHeader scheme={props.scheme} title={`${currentExample().filename} — chromatic`} />
           <div
             ref={editorContentRef}
-            class="flex-1 p-4 font-mono text-xs leading-relaxed overflow-y-auto overflow-x-hidden scrollbar-custom flex flex-col gap-0"
+            class="flex-1 p-4 font-mono text-xs leading-relaxed overflow-y-auto overflow-x-hidden flex flex-col gap-0"
             style={{
               background: props.scheme.background,
               color: props.scheme.foreground,
@@ -376,7 +376,7 @@ export default function Preview(props: PreviewProps) {
         >
           <WindowHeader scheme={props.scheme} title="~/dev/chromatic — zsh" />
           <div
-            class="flex-1 p-4 font-mono text-xs leading-relaxed overflow-y-auto overflow-x-hidden scrollbar-custom flex flex-col gap-0"
+            class="flex-1 p-4 font-mono text-xs leading-relaxed overflow-y-auto overflow-x-hidden flex flex-col gap-0"
             style={{
               background: props.scheme.background,
               color: props.scheme.foreground,

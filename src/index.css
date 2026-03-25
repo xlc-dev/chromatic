@@ -72,27 +72,28 @@
   --animate-slide-up: slide-up 0.2s ease;
 }
 
-.scrollbar-custom {
+:where(*):not(html):not(body) {
   scrollbar-width: thin;
   scrollbar-color: #30363d #0d1117;
 }
 
-.scrollbar-custom::-webkit-scrollbar {
+:where(*):not(html):not(body)::-webkit-scrollbar {
   width: 10px;
+  height: 10px;
 }
 
-.scrollbar-custom::-webkit-scrollbar-track {
+:where(*):not(html):not(body)::-webkit-scrollbar-track {
   background: #0d1117;
   border-left: 1px solid #30363d;
 }
 
-.scrollbar-custom::-webkit-scrollbar-thumb {
+:where(*):not(html):not(body)::-webkit-scrollbar-thumb {
   background: #30363d;
   border-radius: 5px;
   border: 2px solid #0d1117;
   min-height: 40px;
 }
 
-.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+:where(*):not(html):not(body)::-webkit-scrollbar-thumb:hover {
   background: #484f58;
 }
