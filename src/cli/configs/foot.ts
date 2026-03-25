@@ -53,8 +53,8 @@ export function configureFoot(scheme: ColorScheme, configPath?: string): void {
   let footConfig = readConfigFile(footConfigPath);
   if (footConfig) {
     footConfig = footConfig.replace(
-      /(\[colors\][^\n]*\n)([\s\S]*?)(?=\n\[|$)/g,
-      (_match, header, sectionContent) => {
+      /(\[(?:colors|colors-dark)\][^\n]*\n)([\s\S]*?)(?=\n\[|$)/g,
+      (_match, _header, sectionContent) => {
         const lines = sectionContent.split("\n");
         const updatedLines = lines.map((line: string) => {
           const trimmed = line.trim();
@@ -90,12 +90,12 @@ export function configureFoot(scheme: ColorScheme, configPath?: string): void {
             ? "\n" + missingKeys.map((key: FootColorKey) => `${key}=${colorMap[key]}`).join("\n")
             : "";
 
-        return header + updatedLines.join("\n") + additions;
+        return `[colors-dark]\n` + updatedLines.join("\n") + additions;
       }
     );
 
-    if (!footConfig.includes("[colors]")) {
-      const colorsConfig = `[colors]
+    if (!footConfig.includes("[colors-dark]")) {
+      const colorsConfig = `[colors-dark]
 ${Object.entries(colorMap)
   .map(([key, value]) => `${key}=${value}`)
   .join("\n")}
@@ -103,7 +103,7 @@ ${Object.entries(colorMap)
       footConfig = footConfig + "\n" + colorsConfig;
     }
   } else {
-    const colorsConfig = `[colors]
+    const colorsConfig = `[colors-dark]
 ${Object.entries(colorMap)
   .map(([key, value]) => `${key}=${value}`)
   .join("\n")}
