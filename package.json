@@ -19,15 +19,15 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "solid-js": "^1.9.10"
+    "solid-js": "^1.9.12"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.17",
+    "@tailwindcss/vite": "^4.2.2",
     "@types/bun": "latest",
-    "prettier": "^3.7.4",
-    "tailwindcss": "^4.1.17",
+    "prettier": "^3.8.1",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.2",
-    "vite-plugin-solid": "^2.11.10"
+    "vite-plugin-solid": "^2.11.11"
   }
 }
