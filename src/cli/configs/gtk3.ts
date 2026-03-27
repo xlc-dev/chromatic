@@ -38,13 +38,14 @@ window.csd titlebar:backdrop .title, window.csd titlebar:backdrop .subtitle, win
 
 headerbar button, titlebar button, window.csd titlebar button, .csd titlebar button, button.titlebutton {
   color: @headerbar_fg_color;
-  background-color: @headerbar_bg_color;
-  border-color: @border_color;
+  background-color: @button_bg_color;
+  border-color: @button_border_color;
   background-image: none;
 }
 
 headerbar button:hover, titlebar button:hover, button.titlebutton:hover {
-  background-color: @hover_bg_color;
+  background-color: @button_hover_bg_color;
+  border-color: @hover_border_color;
   background-image: none;
 }
 
@@ -67,14 +68,21 @@ entry, textview, treeview.view, iconview, list, .view {
   border-color: @border_color;
 }
 
-button, combobox button, spinbutton, scale slider, checkbutton check, radiobutton radio {
+button, combobox button, spinbutton {
+  color: @theme_fg_color;
+  background-color: @button_bg_color;
+  border-color: @button_border_color;
+}
+
+scale slider, checkbutton check, radiobutton radio {
   color: @theme_fg_color;
   background-color: @theme_bg_color;
   border-color: @border_color;
 }
 
-button:hover, combobox button:hover {
-  background-color: @hover_bg_color;
+button:hover, combobox button:hover, spinbutton:hover {
+  background-color: @button_hover_bg_color;
+  border-color: @hover_border_color;
   background-image: none;
 }
 
@@ -88,6 +96,58 @@ button:focus, combobox button:focus, entry:focus, spinbutton:focus {
   border-color: @accent_bg_color;
 }
 
+button {
+  background-image: none;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 6px;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+button:hover {
+  border-color: @hover_border_color;
+}
+
+button:disabled {
+  color: @insensitive_fg_color;
+  background-color: @insensitive_bg_color;
+  border-color: @border_color;
+}
+
+button.flat {
+  background-color: mix(@button_bg_color, @theme_bg_color, 0.45);
+  border-color: @button_border_color;
+}
+
+button.flat:hover {
+  background-color: @button_hover_bg_color;
+  border-color: @hover_border_color;
+}
+
+button.flat:active,
+button.flat:checked {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
+}
+
+button.suggested-action {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+  border-color: @accent_bg_color;
+}
+
+button.destructive-action {
+  color: @destructive_fg_color;
+  background-color: @destructive_color;
+  border-color: @destructive_color;
+}
+
+button.destructive-action:hover {
+  background-color: mix(@destructive_color, @theme_fg_color, 0.12);
+  border-color: mix(@destructive_color, @theme_fg_color, 0.12);
+}
+
 pathbar, .path-bar, .breadcrumbs {
   color: @theme_fg_color;
   background-color: @theme_bg_color;
@@ -97,13 +157,14 @@ pathbar, .path-bar, .breadcrumbs {
 
 pathbar button, .path-bar button, .breadcrumbs button, pathbar .path-bar-button, .path-bar .path-bar-button {
   color: @theme_fg_color;
-  background-color: @theme_bg_color;
-  border-color: @border_color;
+  background-color: @button_bg_color;
+  border-color: @button_border_color;
   background-image: none;
 }
 
 pathbar button:hover, .path-bar button:hover, .breadcrumbs button:hover, pathbar .path-bar-button:hover, .path-bar .path-bar-button:hover {
-  background-color: @hover_bg_color;
+  background-color: @button_hover_bg_color;
+  border-color: @hover_border_color;
   background-image: none;
 }
 
@@ -135,6 +196,43 @@ popover, menu, tooltip {
   border-color: @border_color;
 }
 
+menu menuitem:hover,
+menubar > menuitem:hover {
+  background-color: @hover_bg_color;
+}
+
+menu menuitem:active,
+menu menuitem:selected,
+menubar > menuitem:active,
+menubar > menuitem:selected {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+}
+
+popover modelbutton:hover {
+  background-color: @hover_bg_color;
+}
+
+popover modelbutton:active,
+popover modelbutton:checked,
+popover modelbutton:selected {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+}
+
+popover list row:hover,
+popover treeview.view row:hover {
+  background-color: @hover_bg_color;
+}
+
+popover list row:selected,
+popover list row:selected:hover,
+popover treeview.view row:selected,
+popover treeview.view row:selected:hover {
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
+}
+
 dialog, messagedialog, .message-dialog {
   color: @theme_fg_color;
   background-color: @theme_bg_color;
@@ -159,15 +257,16 @@ dialog #action_area button, dialog .dialog-action-area button, dialog action-are
 messagedialog #action_area button, messagedialog .dialog-action-area button, messagedialog action-area button, messagedialog box button,
 .message-dialog #action_area button, .message-dialog box button {
   color: @theme_fg_color;
-  background-color: @theme_bg_color;
-  border-color: @border_color;
+  background-color: @button_bg_color;
+  border-color: @button_border_color;
   background-image: none;
 }
 
 dialog #action_area button:hover, dialog .dialog-action-area button:hover, dialog action-area button:hover, dialog box button:hover,
 messagedialog #action_area button:hover, messagedialog .dialog-action-area button:hover, messagedialog action-area button:hover, messagedialog box button:hover,
 .message-dialog #action_area button:hover, .message-dialog box button:hover {
-  background-color: @hover_bg_color;
+  background-color: @button_hover_bg_color;
+  border-color: @hover_border_color;
   background-image: none;
 }
 
@@ -238,6 +337,9 @@ function buildDefineColorBlock(scheme: ColorScheme): string {
     `@define-color insensitive_fg_color mix(${scheme.foreground}, ${scheme.background}, 0.5);`,
     `@define-color insensitive_base_color shade(${scheme.background}, 0.98);`,
     `@define-color hover_bg_color mix(${scheme.inactiveBorder}, ${scheme.background}, 0.07);`,
+    `@define-color button_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.12);`,
+    `@define-color button_border_color mix(${scheme.inactiveBorder}, ${scheme.foreground}, 0.42);`,
+    `@define-color button_hover_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.2);`,
     `@define-color hover_border_color ${scheme.inactiveBorder};`,
     `@define-color border_color ${scheme.inactiveBorder};`,
     `@define-color borders ${scheme.inactiveBorder};`,
@@ -245,6 +347,7 @@ function buildDefineColorBlock(scheme: ColorScheme): string {
     `@define-color error_color ${scheme.urgentBorder};`,
     `@define-color success_color ${scheme.green};`,
     `@define-color destructive_color ${scheme.urgentBorder};`,
+    `@define-color destructive_fg_color ${scheme.white};`,
     `@define-color link_color ${scheme.activeBorder};`,
     `@define-color visited_link_color shade(${scheme.activeBorder}, 0.9);`,
   ];
