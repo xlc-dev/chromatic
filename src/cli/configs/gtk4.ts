@@ -36,14 +36,14 @@ headerbar button:active, headerbar button:checked, windowcontrols button:active,
 }
 
 headerbar:backdrop, .titlebar:backdrop {
-  color: @insensitive_fg_color !important;
-  background-color: @headerbar_bg_color !important;
-  border-color: @border_color !important;
-  background-image: none !important;
+  color: @insensitive_fg_color;
+  background-color: @headerbar_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
 headerbar:backdrop .title, headerbar:backdrop .subtitle, .titlebar:backdrop .title, .titlebar:backdrop .subtitle {
-  color: @insensitive_fg_color !important;
+  color: @insensitive_fg_color;
 }
 
 headerbar button:backdrop, windowcontrols button:backdrop, .titlebar button:backdrop {
@@ -246,7 +246,7 @@ dialog:backdrop {
 }
 
 dialog:backdrop headerbar, dialog:backdrop .title, dialog:backdrop .subtitle {
-  color: @insensitive_fg_color !important;
+  color: @insensitive_fg_color;
 }
 
 dialog button, dialog .dialog-action-area button, dialog actionbar button {
@@ -278,10 +278,7 @@ dialog button.suggested-action, dialog .dialog-action-area button.suggested-acti
 
 dialog button.suggested-action:active, dialog button.suggested-action:checked,
 dialog .dialog-action-area button.suggested-action:active, dialog .dialog-action-area button.suggested-action:checked,
-dialog actionbar button.suggested-action:active, dialog actionbar button.suggested-action:checked,
-dialog button:default:active, dialog button:default:checked,
-dialog .dialog-action-area button:default:active, dialog .dialog-action-area button:default:checked,
-dialog actionbar button:default:active, dialog actionbar button:default:checked {
+dialog actionbar button.suggested-action:active, dialog actionbar button.suggested-action:checked {
   color: @accent_fg_color;
   background-color: @accent_bg_color;
   border-color: @accent_bg_color;

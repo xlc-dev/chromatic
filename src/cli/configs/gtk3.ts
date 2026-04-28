@@ -24,16 +24,16 @@ window.csd titlebar, window.csd .titlebar, .csd titlebar, .csd .titlebar {
 }
 
 headerbar:backdrop, titlebar:backdrop, window.csd titlebar:backdrop, window.csd .titlebar:backdrop, .csd titlebar:backdrop, .csd .titlebar:backdrop {
-  color: @insensitive_fg_color !important;
-  background-color: @headerbar_bg_color !important;
-  border-color: @border_color !important;
-  background-image: none !important;
+  color: @insensitive_fg_color;
+  background-color: @headerbar_bg_color;
+  border-color: @border_color;
+  background-image: none;
 }
 
 headerbar:backdrop .title, headerbar:backdrop .subtitle, titlebar:backdrop .title, titlebar:backdrop .subtitle,
 window.csd titlebar:backdrop .title, window.csd titlebar:backdrop .subtitle, window.csd .titlebar:backdrop .title, window.csd .titlebar:backdrop .subtitle,
 .csd titlebar:backdrop .title, .csd titlebar:backdrop .subtitle, .csd .titlebar:backdrop .title, .csd .titlebar:backdrop .subtitle {
-  color: @insensitive_fg_color !important;
+  color: @insensitive_fg_color;
 }
 
 headerbar button, titlebar button, window.csd titlebar button, .csd titlebar button, button.titlebutton {
@@ -250,7 +250,7 @@ dialog:backdrop, messagedialog:backdrop, .message-dialog:backdrop {
 }
 
 dialog:backdrop headerbar, messagedialog:backdrop headerbar, .message-dialog:backdrop headerbar {
-  color: @insensitive_fg_color !important;
+  color: @insensitive_fg_color;
 }
 
 dialog #action_area button, dialog .dialog-action-area button, dialog action-area button, dialog box button,
@@ -290,10 +290,7 @@ messagedialog #action_area button.suggested-action, messagedialog .dialog-action
 
 dialog #action_area button.suggested-action:active, dialog #action_area button.suggested-action:checked, dialog .dialog-action-area button.suggested-action:active, dialog .dialog-action-area button.suggested-action:checked, dialog action-area button.suggested-action:active, dialog action-area button.suggested-action:checked, dialog box button.suggested-action:active, dialog box button.suggested-action:checked,
 messagedialog #action_area button.suggested-action:active, messagedialog #action_area button.suggested-action:checked, messagedialog .dialog-action-area button.suggested-action:active, messagedialog .dialog-action-area button.suggested-action:checked, messagedialog action-area button.suggested-action:active, messagedialog action-area button.suggested-action:checked, messagedialog box button.suggested-action:active, messagedialog box button.suggested-action:checked,
-.message-dialog #action_area button.suggested-action:active, .message-dialog #action_area button.suggested-action:checked, .message-dialog box button.suggested-action:active, .message-dialog box button.suggested-action:checked,
-dialog #action_area button:default:active, dialog #action_area button:default:checked, dialog .dialog-action-area button:default:active, dialog .dialog-action-area button:default:checked, dialog action-area button:default:active, dialog action-area button:default:checked, dialog box button:default:active, dialog box button:default:checked,
-messagedialog #action_area button:default:active, messagedialog #action_area button:default:checked, messagedialog .dialog-action-area button:default:active, messagedialog .dialog-action-area button:default:checked, messagedialog action-area button:default:active, messagedialog action-area button:default:checked, messagedialog box button:default:active, messagedialog box button:default:checked,
-.message-dialog #action_area button:default:active, .message-dialog #action_area button:default:checked, .message-dialog box button:default:active, .message-dialog box button:default:checked {
+.message-dialog #action_area button.suggested-action:active, .message-dialog #action_area button.suggested-action:checked, .message-dialog box button.suggested-action:active, .message-dialog box button.suggested-action:checked {
   color: @accent_fg_color;
   background-color: @accent_bg_color;
   border-color: @accent_bg_color;
