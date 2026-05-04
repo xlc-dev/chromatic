@@ -55,11 +55,7 @@ const GTK3_CSS = String.raw`
 window,
 assistant,
 .background,
-.application {
-  color: @theme_fg_color;
-  background-color: @theme_bg_color;
-}
-
+.application,
 .application > box,
 .application > grid,
 .application > revealer,
@@ -425,7 +421,22 @@ spinbutton,
 list button,
 list row button,
 row button,
-treeview.view button {
+treeview.view button,
+pathbar button,
+.path-bar button,
+.breadcrumbs button,
+pathbar .path-bar-button,
+.path-bar .path-bar-button,
+dialog #action_area button,
+dialog .dialog-action-area button,
+dialog action-area button,
+dialog box button,
+messagedialog #action_area button,
+messagedialog .dialog-action-area button,
+messagedialog action-area button,
+messagedialog box button,
+.message-dialog #action_area button,
+.message-dialog box button {
   color: @theme_fg_color;
   background-color: @button_bg_color;
   border-color: @button_border_color;
@@ -449,34 +460,7 @@ treeview.view check,
 list radio,
 list row radio,
 row radio,
-treeview.view radio {
-  color: @theme_fg_color;
-  background-color: @theme_bg_color;
-  border-color: @border_color;
-  border-style: solid;
-  border-width: 1px;
-  background-image: none;
-  box-shadow: none;
-  -gtk-icon-source: none;
-  -gtk-icon-shadow: none;
-}
-
-checkbutton check,
-list check,
-list row check,
-row check,
-treeview.view check {
-  border-radius: 4px;
-}
-
-radiobutton radio,
-list radio,
-list row radio,
-row radio,
-treeview.view radio {
-  border-radius: 999px;
-}
-
+treeview.view radio,
 menu menuitem check,
 menu menuitem radio,
 modelbutton check,
@@ -492,11 +476,21 @@ modelbutton radio {
   -gtk-icon-shadow: none;
 }
 
+checkbutton check,
+list check,
+list row check,
+row check,
+treeview.view check,
 menu menuitem check,
 modelbutton check {
   border-radius: 4px;
 }
 
+radiobutton radio,
+list radio,
+list row radio,
+row radio,
+treeview.view radio,
 menu menuitem radio,
 modelbutton radio {
   border-radius: 999px;
@@ -608,7 +602,23 @@ spinbutton:hover,
 list button:hover,
 list row button:hover,
 row button:hover,
-treeview.view button:hover {
+treeview.view button:hover,
+pathbar button:hover,
+.path-bar button:hover,
+.breadcrumbs button:hover,
+pathbar .path-bar-button:hover,
+.path-bar .path-bar-button:hover,
+dialog #action_area button:hover,
+dialog .dialog-action-area button:hover,
+dialog action-area button:hover,
+dialog box button:hover,
+messagedialog #action_area button:hover,
+messagedialog .dialog-action-area button:hover,
+messagedialog action-area button:hover,
+messagedialog box button:hover,
+.message-dialog #action_area button:hover,
+.message-dialog box button:hover,
+button.flat:hover {
   background-color: @button_hover_bg_color;
   border-color: @hover_border_color;
   background-image: none;
@@ -625,10 +635,67 @@ list row button:checked,
 row button:active,
 row button:checked,
 treeview.view button:active,
-treeview.view button:checked {
+treeview.view button:checked,
+pathbar button:active,
+pathbar button:checked,
+.path-bar button:active,
+.path-bar button:checked,
+.breadcrumbs button:active,
+.breadcrumbs button:checked,
+dialog #action_area button:active,
+dialog #action_area button:checked,
+dialog .dialog-action-area button:active,
+dialog .dialog-action-area button:checked,
+dialog action-area button:active,
+dialog action-area button:checked,
+dialog box button:active,
+dialog box button:checked,
+messagedialog #action_area button:active,
+messagedialog #action_area button:checked,
+messagedialog .dialog-action-area button:active,
+messagedialog .dialog-action-area button:checked,
+messagedialog action-area button:active,
+messagedialog action-area button:checked,
+messagedialog box button:active,
+messagedialog box button:checked,
+.message-dialog #action_area button:active,
+.message-dialog #action_area button:checked,
+.message-dialog box button:active,
+.message-dialog box button:checked,
+button.flat:active,
+button.flat:checked,
+button.suggested-action,
+dialog #action_area button.suggested-action,
+dialog .dialog-action-area button.suggested-action,
+dialog action-area button.suggested-action,
+messagedialog #action_area button.suggested-action,
+messagedialog .dialog-action-area button.suggested-action,
+messagedialog action-area button.suggested-action,
+.message-dialog #action_area button.suggested-action,
+dialog #action_area button.suggested-action:active,
+dialog #action_area button.suggested-action:checked,
+dialog .dialog-action-area button.suggested-action:active,
+dialog .dialog-action-area button.suggested-action:checked,
+dialog action-area button.suggested-action:active,
+dialog action-area button.suggested-action:checked,
+dialog box button.suggested-action:active,
+dialog box button.suggested-action:checked,
+messagedialog #action_area button.suggested-action:active,
+messagedialog #action_area button.suggested-action:checked,
+messagedialog .dialog-action-area button.suggested-action:active,
+messagedialog .dialog-action-area button.suggested-action:checked,
+messagedialog action-area button.suggested-action:active,
+messagedialog action-area button.suggested-action:checked,
+messagedialog box button.suggested-action:active,
+messagedialog box button.suggested-action:checked,
+.message-dialog #action_area button.suggested-action:active,
+.message-dialog #action_area button.suggested-action:checked,
+.message-dialog box button.suggested-action:active,
+.message-dialog box button.suggested-action:checked {
   color: @accent_fg_color;
   background-color: @accent_bg_color;
   border-color: @accent_bg_color;
+  background-image: none;
 }
 
 button:focus,
@@ -667,24 +734,6 @@ button:disabled {
 button.flat {
   background-color: mix(@button_bg_color, @theme_bg_color, 0.45);
   border-color: @button_border_color;
-}
-
-button.flat:hover {
-  background-color: @button_hover_bg_color;
-  border-color: @hover_border_color;
-}
-
-button.flat:active,
-button.flat:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-}
-
-button.suggested-action {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
 }
 
 button.destructive-action {
@@ -728,38 +777,6 @@ pathbar,
   background-color: @theme_bg_color;
   border-color: @border_color;
   background-image: none;
-}
-
-pathbar button,
-.path-bar button,
-.breadcrumbs button,
-pathbar .path-bar-button,
-.path-bar .path-bar-button {
-  color: @theme_fg_color;
-  background-color: @button_bg_color;
-  border-color: @button_border_color;
-  background-image: none;
-}
-
-pathbar button:hover,
-.path-bar button:hover,
-.breadcrumbs button:hover,
-pathbar .path-bar-button:hover,
-.path-bar .path-bar-button:hover {
-  background-color: @button_hover_bg_color;
-  border-color: @hover_border_color;
-  background-image: none;
-}
-
-pathbar button:active,
-pathbar button:checked,
-.path-bar button:active,
-.path-bar button:checked,
-.breadcrumbs button:active,
-.breadcrumbs button:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
 }
 
 selection,
@@ -952,102 +969,6 @@ dialog:backdrop headerbar,
 messagedialog:backdrop headerbar,
 .message-dialog:backdrop headerbar {
   color: @insensitive_fg_color;
-}
-
-dialog #action_area button,
-dialog .dialog-action-area button,
-dialog action-area button,
-dialog box button,
-messagedialog #action_area button,
-messagedialog .dialog-action-area button,
-messagedialog action-area button,
-messagedialog box button,
-.message-dialog #action_area button,
-.message-dialog box button {
-  color: @theme_fg_color;
-  background-color: @button_bg_color;
-  border-color: @button_border_color;
-  background-image: none;
-}
-
-dialog #action_area button:hover,
-dialog .dialog-action-area button:hover,
-dialog action-area button:hover,
-dialog box button:hover,
-messagedialog #action_area button:hover,
-messagedialog .dialog-action-area button:hover,
-messagedialog action-area button:hover,
-messagedialog box button:hover,
-.message-dialog #action_area button:hover,
-.message-dialog box button:hover {
-  background-color: @button_hover_bg_color;
-  border-color: @hover_border_color;
-  background-image: none;
-}
-
-dialog #action_area button:active,
-dialog #action_area button:checked,
-dialog .dialog-action-area button:active,
-dialog .dialog-action-area button:checked,
-dialog action-area button:active,
-dialog action-area button:checked,
-dialog box button:active,
-dialog box button:checked,
-messagedialog #action_area button:active,
-messagedialog #action_area button:checked,
-messagedialog .dialog-action-area button:active,
-messagedialog .dialog-action-area button:checked,
-messagedialog action-area button:active,
-messagedialog action-area button:checked,
-messagedialog box button:active,
-messagedialog box button:checked,
-.message-dialog #action_area button:active,
-.message-dialog #action_area button:checked,
-.message-dialog box button:active,
-.message-dialog box button:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-  background-image: none;
-}
-
-dialog #action_area button.suggested-action,
-dialog .dialog-action-area button.suggested-action,
-dialog action-area button.suggested-action,
-messagedialog #action_area button.suggested-action,
-messagedialog .dialog-action-area button.suggested-action,
-messagedialog action-area button.suggested-action,
-.message-dialog #action_area button.suggested-action {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-  background-image: none;
-}
-
-dialog #action_area button.suggested-action:active,
-dialog #action_area button.suggested-action:checked,
-dialog .dialog-action-area button.suggested-action:active,
-dialog .dialog-action-area button.suggested-action:checked,
-dialog action-area button.suggested-action:active,
-dialog action-area button.suggested-action:checked,
-dialog box button.suggested-action:active,
-dialog box button.suggested-action:checked,
-messagedialog #action_area button.suggested-action:active,
-messagedialog #action_area button.suggested-action:checked,
-messagedialog .dialog-action-area button.suggested-action:active,
-messagedialog .dialog-action-area button.suggested-action:checked,
-messagedialog action-area button.suggested-action:active,
-messagedialog action-area button.suggested-action:checked,
-messagedialog box button.suggested-action:active,
-messagedialog box button.suggested-action:checked,
-.message-dialog #action_area button.suggested-action:active,
-.message-dialog #action_area button.suggested-action:checked,
-.message-dialog box button.suggested-action:active,
-.message-dialog box button.suggested-action:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-  background-image: none;
 }
 
 levelbar trough {

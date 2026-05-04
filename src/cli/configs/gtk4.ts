@@ -576,19 +576,13 @@ columnview listview.separators row:backdrop {
   border-bottom-color: mix(@window_bg_color, @window_fg_color, 0.18);
 }
 
-listview button,
-row button,
-columnview button {
-  color: @window_fg_color;
-  background-color: @button_bg_color;
-  border-color: @button_border_color;
-  background-image: none;
-}
-
 button,
 dropdown > button,
 combobox button,
-spinbutton > button {
+spinbutton > button,
+listview button,
+row button,
+columnview button {
   color: @window_fg_color;
   background-color: @button_bg_color;
   border-color: @button_border_color;
@@ -700,15 +694,14 @@ progressbar:backdrop text {
 button:hover,
 dropdown > button:hover,
 combobox button:hover,
-spinbutton > button:hover {
-  background-color: @button_hover_bg_color;
-  border-color: @hover_border_color;
-  background-image: none;
-}
-
+spinbutton > button:hover,
 listview button:hover,
 row button:hover,
-columnview button:hover {
+columnview button:hover,
+button.flat:hover,
+menubutton.flat > button:hover,
+window.dialog button:hover,
+window.dialog actionbar button:hover {
   background-color: @button_hover_bg_color;
   border-color: @hover_border_color;
   background-image: none;
@@ -721,12 +714,7 @@ dropdown > button:checked,
 combobox button:active,
 combobox button:checked,
 spinbutton > button:active,
-spinbutton > button:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-}
-
+spinbutton > button:checked,
 listview button:active,
 listview button:checked,
 row button:active,
@@ -738,10 +726,26 @@ row check:checked,
 columnview check:checked,
 listview radio:checked,
 row radio:checked,
-columnview radio:checked {
+columnview radio:checked,
+button.flat:active,
+button.flat:checked,
+menubutton.flat > button:active,
+button.suggested-action,
+menubutton.suggested-action > button,
+window.dialog button:active,
+window.dialog button:checked,
+window.dialog actionbar button:active,
+window.dialog actionbar button:checked,
+window.dialog button.suggested-action,
+window.dialog actionbar button.suggested-action,
+window.dialog button.suggested-action:active,
+window.dialog button.suggested-action:checked,
+window.dialog actionbar button.suggested-action:active,
+window.dialog actionbar button.suggested-action:checked {
   color: @accent_fg_color;
   background-color: @accent_bg_color;
   border-color: @accent_bg_color;
+  background-image: none;
 }
 
 button:focus,
@@ -806,27 +810,6 @@ button.flat,
 menubutton.flat > button {
   background-color: mix(@button_bg_color, @window_bg_color, 0.45);
   border-color: @button_border_color;
-}
-
-button.flat:hover,
-menubutton.flat > button:hover {
-  background-color: @button_hover_bg_color;
-  border-color: @hover_border_color;
-}
-
-button.flat:active,
-button.flat:checked,
-menubutton.flat > button:active {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-}
-
-button.suggested-action,
-menubutton.suggested-action > button {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
 }
 
 button.destructive-action,
@@ -954,41 +937,6 @@ window.dialog actionbar button {
   color: @dialog_fg_color;
   background-color: @button_bg_color;
   border-color: @button_border_color;
-  background-image: none;
-}
-
-window.dialog button:hover,
-window.dialog actionbar button:hover {
-  background-color: @button_hover_bg_color;
-  border-color: @hover_border_color;
-  background-image: none;
-}
-
-window.dialog button:active,
-window.dialog button:checked,
-window.dialog actionbar button:active,
-window.dialog actionbar button:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-  background-image: none;
-}
-
-window.dialog button.suggested-action,
-window.dialog actionbar button.suggested-action {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
-  background-image: none;
-}
-
-window.dialog button.suggested-action:active,
-window.dialog button.suggested-action:checked,
-window.dialog actionbar button.suggested-action:active,
-window.dialog actionbar button.suggested-action:checked {
-  color: @accent_fg_color;
-  background-color: @accent_bg_color;
-  border-color: @accent_bg_color;
   background-image: none;
 }
 
