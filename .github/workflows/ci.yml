@@ -21,7 +21,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.3"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
@@ -46,7 +46,7 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.3"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
@@ -54,11 +54,11 @@ jobs:
             ${{ runner.os }}-bun-
       - run: bun install --frozen-lockfile
       - run: bun run build
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   release:
     needs: check
@@ -68,10 +68,13 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: "1.3.3"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.bun/install/cache
           key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
@@ -79,11 +82,45 @@ jobs:
             ${{ runner.os }}-bun-
       - run: bun install --frozen-lockfile
       - run: bun run build:cli
-      - uses: softprops/action-gh-release@v2
+      - name: Write release notes
+        run: |
+          NOTES="${RUNNER_TEMP}/release-notes.md"
+          PREV_TAG="$(git tag -l 'release-*' --sort=-version:refname | head -n1)"
+          REPO="${{ github.repository }}"
+
+          {
+            if [ -n "$PREV_TAG" ]; then
+              echo "## Changes since ${PREV_TAG}"
+              echo ""
+              git -c log.showSignature=false log "${PREV_TAG}..HEAD" --reverse --date=short \
+                --format="- **%s** ([%h](https://github.com/${REPO}/commit/%H)) by %an, %ad%n%n%b%n"
+              echo ""
+              echo "[Compare ${PREV_TAG}...${{ github.sha }}](https://github.com/${REPO}/compare/${PREV_TAG}...${{ github.sha }})"
+            else
+              BEFORE="${{ github.event.before }}"
+              if [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+                RANGE="HEAD"
+                echo "## Changes (first release)"
+              else
+                RANGE="${BEFORE}..HEAD"
+                echo "## Changes since previous push"
+              fi
+              echo ""
+              git -c log.showSignature=false log "$RANGE" --reverse --date=short \
+                --format="- **%s** ([%h](https://github.com/${REPO}/commit/%H)) by %an, %ad%n%n%b%n"
+            fi
+            echo ""
+            echo "---"
+            echo ""
+            echo "**Release commit:** [\`${{ github.sha }}\`](https://github.com/${REPO}/commit/${{ github.sha }}) · workflow run #${{ github.run_number }}"
+          } > "$NOTES"
+
+          echo "RELEASE_NOTES_PATH=$NOTES" >> "$GITHUB_ENV"
+      - uses: softprops/action-gh-release@v3
         with:
           tag_name: release-${{ github.run_number }}
           name: Release ${{ github.run_number }}
-          body: ${{ github.sha }}
+          body_path: ${{ env.RELEASE_NOTES_PATH }}
           files: dist/chromatic-*
           make_latest: true
         env:
