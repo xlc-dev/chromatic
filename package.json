@@ -6,27 +6,22 @@
     "dev": "vite",
     "build": "vite build",
     "build:all": "bun run build && bun run build:cli",
-    "build:cli": "bun scripts/build-cli.js | sh -e",
-    "build:cli:x64-glibc": "bun build --compile --minify --target=bun-linux-x64 src/cli/cli.ts --outfile dist/chromatic-x64-glibc",
-    "build:cli:x64-musl": "bun build --compile --minify --target=bun-linux-x64-musl src/cli/cli.ts --outfile dist/chromatic-x64-musl",
-    "build:cli:arm64-glibc": "bun build --compile --minify --target=bun-linux-arm64 src/cli/cli.ts --outfile dist/chromatic-arm64-glibc",
-    "build:cli:arm64-musl": "bun build --compile --minify --target=bun-linux-arm64-musl src/cli/cli.ts --outfile dist/chromatic-arm64-musl",
-    "build:cli:macos-x64": "bun build --compile --minify --target=bun-macos-x64 src/cli/cli.ts --outfile dist/chromatic-macos-x64",
-    "build:cli:macos-arm64": "bun build --compile --minify --target=bun-macos-arm64 src/cli/cli.ts --outfile dist/chromatic-macos-arm64",
+    "build:cli": "bun scripts/build-cli.ts",
     "check": "bun run format:check && bunx tsc --noEmit",
     "preview": "vite preview",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "solid-js": "^1.9.12"
+    "solid-js": "^1.9.13"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.2",
-    "prettier": "^3.8.1",
-    "tailwindcss": "^4.2.2",
+    "@tailwindcss/vite": "^4.3.0",
+    "@types/bun": "^1.3.14",
+    "prettier": "^3.8.3",
+    "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.2",
-    "vite-plugin-solid": "^2.11.11"
+    "vite": "^8.0.13",
+    "vite-plugin-solid": "^2.11.12"
   }
 }
