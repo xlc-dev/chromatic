@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.2.2",
-    "@types/bun": "latest",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.2.2",
     "typescript": "^6.0.3",
