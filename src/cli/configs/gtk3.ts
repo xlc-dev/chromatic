@@ -4,12 +4,15 @@ import type { ColorScheme } from "../../types";
 import { ensureDir, writeConfigFile } from "../utils";
 
 function buildGtkDefineColorBlock(scheme: ColorScheme): string {
+  const border = `mix(${scheme.foreground}, ${scheme.background}, 0.72)`;
+  const base = `mix(${scheme.background}, ${scheme.black}, 0.16)`;
+  const accentBg = `mix(${scheme.blue}, ${scheme.background}, 0.45)`;
   return [
     `@define-color theme_bg_color ${scheme.background};`,
     `@define-color theme_fg_color ${scheme.foreground};`,
-    `@define-color theme_base_color mix(${scheme.background}, ${scheme.black}, 0.16);`,
+    `@define-color theme_base_color ${base};`,
     `@define-color theme_text_color ${scheme.foreground};`,
-    `@define-color theme_selected_bg_color mix(${scheme.activeBorder}, ${scheme.blue}, 0.45);`,
+    `@define-color theme_selected_bg_color ${accentBg};`,
     `@define-color theme_selected_fg_color ${scheme.foreground};`,
     `@define-color bg_color ${scheme.background};`,
     `@define-color fg_color ${scheme.foreground};`,
@@ -17,63 +20,36 @@ function buildGtkDefineColorBlock(scheme: ColorScheme): string {
     `@define-color text_color ${scheme.foreground};`,
     `@define-color selected_bg_color @theme_selected_bg_color;`,
     `@define-color selected_fg_color ${scheme.foreground};`,
-    `@define-color accent_bg_color mix(${scheme.activeBorder}, ${scheme.blue}, 0.45);`,
+    `@define-color accent_bg_color ${accentBg};`,
     `@define-color accent_fg_color ${scheme.foreground};`,
-    `@define-color accent_color ${scheme.activeBorder};`,
+    `@define-color accent_color ${scheme.blue};`,
     `@define-color window_bg_color ${scheme.background};`,
     `@define-color window_fg_color ${scheme.foreground};`,
-    `@define-color view_bg_color mix(${scheme.background}, ${scheme.black}, 0.16);`,
+    `@define-color view_bg_color ${base};`,
     `@define-color view_fg_color ${scheme.foreground};`,
-    `@define-color headerbar_bg_color mix(${scheme.background}, ${scheme.black}, 0.28);`,
-    `@define-color headerbar_fg_color mix(${scheme.foreground}, ${scheme.brightWhite}, 0.12);`,
-    `@define-color headerbar_button_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.42);`,
-    `@define-color headerbar_button_hover_bg_color mix(${scheme.background}, ${scheme.cyan}, 0.12);`,
-    `@define-color popover_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.28);`,
+    `@define-color headerbar_bg_color ${scheme.background};`,
+    `@define-color headerbar_fg_color ${scheme.foreground};`,
+    `@define-color popover_bg_color ${scheme.background};`,
     `@define-color popover_fg_color ${scheme.foreground};`,
-    `@define-color card_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.38);`,
-    `@define-color sidebar_bg_color mix(${scheme.background}, ${scheme.blue}, 0.08);`,
-    `@define-color sidebar_fg_color mix(${scheme.foreground}, ${scheme.brightWhite}, 0.08);`,
-    `@define-color sidebar_selected_bg_color mix(${scheme.activeBorder}, ${scheme.blue}, 0.35);`,
-    `@define-color sidebar_highlight_bg_color mix(${scheme.magenta}, ${scheme.background}, 0.28);`,
-    `@define-color insensitive_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.2);`,
+    `@define-color card_bg_color shade(${scheme.background}, 1.03);`,
+    `@define-color sidebar_bg_color shade(${scheme.background}, 0.97);`,
+    `@define-color sidebar_fg_color ${scheme.foreground};`,
+    `@define-color insensitive_bg_color shade(${scheme.background}, 0.98);`,
     `@define-color insensitive_fg_color mix(${scheme.foreground}, ${scheme.background}, 0.5);`,
-    `@define-color insensitive_base_color mix(${scheme.background}, ${scheme.black}, 0.12);`,
-    `@define-color hover_bg_color mix(${scheme.background}, ${scheme.cyan}, 0.12);`,
-    `@define-color button_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.46);`,
-    `@define-color button_border_color mix(${scheme.inactiveBorder}, ${scheme.activeBorder}, 0.28);`,
-    `@define-color button_hover_bg_color mix(${scheme.background}, ${scheme.blue}, 0.22);`,
-    `@define-color entry_bg_color mix(${scheme.background}, ${scheme.black}, 0.22);`,
-    `@define-color entry_border_color mix(${scheme.inactiveBorder}, ${scheme.blue}, 0.18);`,
-    `@define-color entry_focus_bg_color mix(${scheme.background}, ${scheme.blue}, 0.08);`,
-    `@define-color tab_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.32);`,
-    `@define-color tab_hover_bg_color mix(${scheme.background}, ${scheme.blue}, 0.16);`,
-    `@define-color tab_active_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.62);`,
-    `@define-color tab_active_border_color ${scheme.activeBorder};`,
-    `@define-color selection_bg_color @theme_selected_bg_color;`,
-    `@define-color selection_backdrop_bg_color mix(${scheme.activeBorder}, ${scheme.background}, 0.35);`,
-    `@define-color focus_border_color ${scheme.cyan};`,
-    `@define-color hover_border_color mix(${scheme.inactiveBorder}, ${scheme.cyan}, 0.18);`,
-    `@define-color border_color ${scheme.inactiveBorder};`,
-    `@define-color borders ${scheme.inactiveBorder};`,
+    `@define-color insensitive_base_color shade(${scheme.background}, 0.98);`,
+    `@define-color hover_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.12);`,
+    `@define-color button_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.12);`,
+    `@define-color button_border_color mix(${border}, ${scheme.foreground}, 0.42);`,
+    `@define-color button_hover_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.2);`,
+    `@define-color hover_border_color ${border};`,
+    `@define-color border_color ${border};`,
+    `@define-color borders ${border};`,
     `@define-color warning_color ${scheme.yellow};`,
-    `@define-color warning_bg_color mix(${scheme.yellow}, ${scheme.background}, 0.38);`,
-    `@define-color warning_fg_color ${scheme.black};`,
-    `@define-color error_color ${scheme.urgentBorder};`,
-    `@define-color error_bg_color mix(${scheme.urgentBorder}, ${scheme.background}, 0.35);`,
-    `@define-color error_fg_color ${scheme.white};`,
+    `@define-color error_color ${scheme.red};`,
     `@define-color success_color ${scheme.green};`,
-    `@define-color success_bg_color mix(${scheme.green}, ${scheme.background}, 0.35);`,
-    `@define-color success_fg_color ${scheme.black};`,
-    `@define-color info_color ${scheme.cyan};`,
-    `@define-color info_bg_color mix(${scheme.cyan}, ${scheme.background}, 0.35);`,
-    `@define-color info_fg_color ${scheme.black};`,
-    `@define-color question_color ${scheme.blue};`,
-    `@define-color question_bg_color mix(${scheme.blue}, ${scheme.background}, 0.35);`,
-    `@define-color question_fg_color ${scheme.foreground};`,
-    `@define-color destructive_color ${scheme.urgentBorder};`,
+    `@define-color destructive_color ${scheme.red};`,
     `@define-color destructive_fg_color ${scheme.white};`,
-    `@define-color progress_bg_color ${scheme.green};`,
-    `@define-color link_color ${scheme.cyan};`,
+    `@define-color link_color ${scheme.blue};`,
     `@define-color visited_link_color ${scheme.magenta};`,
   ].join("\n");
 }
@@ -124,7 +100,7 @@ titlebar button,
 .titlebar button,
 button.titlebutton {
   color: @headerbar_fg_color;
-  background-color: @headerbar_button_bg_color;
+  background-color: @button_bg_color;
   border-color: @button_border_color;
   background-image: none;
 }
@@ -132,7 +108,7 @@ button.titlebutton {
 headerbar button:hover,
 titlebar button:hover,
 button.titlebutton:hover {
-  background-color: @headerbar_button_hover_bg_color;
+  background-color: @button_hover_bg_color;
   border-color: @hover_border_color;
   background-image: none;
 }
@@ -158,13 +134,6 @@ button.titlebutton:backdrop {
 }
 
 entry,
-spinbutton,
-spinbutton entry {
-  color: @theme_text_color;
-  background-color: @entry_bg_color;
-  border-color: @entry_border_color;
-}
-
 textview,
 treeview.view,
 iconview,
@@ -370,12 +339,12 @@ treeview.view header button:checked {
 .sidebar row:selected,
 .sidebar row:selected:hover {
   color: @theme_selected_fg_color;
-  background-color: @sidebar_selected_bg_color;
+  background-color: @accent_bg_color;
 }
 
 .sidebar label.highlight {
-  color: @theme_fg_color;
-  background-color: @sidebar_highlight_bg_color;
+  color: @accent_fg_color;
+  background-color: @accent_bg_color;
   background-image: none;
   border-radius: 6px;
   padding: 6px 10px;
@@ -401,7 +370,7 @@ notebook > header > tabs {
 
 notebook tab {
   color: @insensitive_fg_color;
-  background-color: @tab_bg_color;
+  background-color: mix(@card_bg_color, @theme_fg_color, 0.08);
   border-color: @border_color;
   background-image: none;
   border-style: solid;
@@ -414,39 +383,44 @@ notebook tab {
 
 notebook tab:hover {
   color: @theme_fg_color;
-  background-color: @tab_hover_bg_color;
+  background-color: mix(@card_bg_color, @theme_fg_color, 0.14);
   border-color: @hover_border_color;
   box-shadow: none;
 }
 
 notebook tab:checked {
   color: @theme_fg_color;
-  background-color: @tab_active_bg_color;
-  border-color: @tab_active_border_color;
+  background-color: @theme_bg_color;
+  border-color: @border_color;
   box-shadow: none;
+}
+
+notebook tab:checked:backdrop {
+  color: @theme_fg_color;
+  background-color: @theme_bg_color;
 }
 
 notebook tab:backdrop {
   color: @insensitive_fg_color;
-  background-color: @card_bg_color;
+  background-color: mix(@card_bg_color, @theme_fg_color, 0.08);
   border-color: @border_color;
   box-shadow: none;
 }
 
 notebook > header.top tab:checked {
-  border-bottom-color: @tab_active_bg_color;
+  border-bottom-color: @theme_bg_color;
 }
 
 notebook > header.bottom tab:checked {
-  border-top-color: @tab_active_bg_color;
+  border-top-color: @theme_bg_color;
 }
 
 notebook > header.left tab:checked {
-  border-right-color: @tab_active_bg_color;
+  border-right-color: @theme_bg_color;
 }
 
 notebook > header.right tab:checked {
-  border-left-color: @tab_active_bg_color;
+  border-left-color: @theme_bg_color;
 }
 
 button,
@@ -740,18 +714,12 @@ list button:focus,
 list row button:focus,
 row button:focus,
 treeview.view button:focus {
-  border-color: @focus_border_color;
+  border-color: @accent_bg_color;
   box-shadow: none;
   background-image: none;
   outline-color: transparent;
   outline-style: none;
   outline-width: 0;
-}
-
-entry:focus,
-spinbutton:focus,
-spinbutton entry:focus {
-  background-color: @entry_focus_bg_color;
 }
 
 button {
@@ -772,7 +740,7 @@ button:disabled {
 }
 
 button.flat {
-  background-color: @card_bg_color;
+  background-color: mix(@button_bg_color, @theme_bg_color, 0.45);
   border-color: @button_border_color;
 }
 
@@ -834,7 +802,7 @@ list row:selected:hover,
 row:selected,
 row:selected:hover {
   color: @theme_selected_fg_color;
-  background-color: @selection_bg_color;
+  background-color: @accent_bg_color;
 }
 
 treeview.view:selected:backdrop,
@@ -842,7 +810,7 @@ iconview:selected:backdrop,
 list row:selected:backdrop,
 row:selected:backdrop {
   color: @theme_selected_fg_color;
-  background-color: @selection_backdrop_bg_color;
+  background-color: mix(@accent_bg_color, @theme_bg_color, 0.35);
 }
 
 popover,
@@ -855,7 +823,7 @@ tooltip {
 
 infobar {
   color: @theme_fg_color;
-  background-color: @card_bg_color;
+  background-color: mix(@theme_bg_color, @theme_fg_color, 0.22);
   border-color: @border_color;
   border-style: solid;
   border-width: 1px;
@@ -875,26 +843,22 @@ infobar label {
 }
 
 infobar.info {
-  color: @info_fg_color;
-  background-color: @info_bg_color;
-  border-color: @info_color;
+  background-color: mix(@accent_bg_color, @theme_bg_color, 0.5);
+  border-color: @accent_bg_color;
 }
 
 infobar.warning {
-  color: @warning_fg_color;
-  background-color: @warning_bg_color;
+  background-color: mix(@warning_color, @theme_bg_color, 0.5);
   border-color: @warning_color;
 }
 
 infobar.question {
-  color: @question_fg_color;
-  background-color: @question_bg_color;
-  border-color: @question_color;
+  background-color: mix(@accent_color, @theme_bg_color, 0.5);
+  border-color: @accent_color;
 }
 
 infobar.error {
-  color: @error_fg_color;
-  background-color: @error_bg_color;
+  background-color: mix(@error_color, @theme_bg_color, 0.5);
   border-color: @error_color;
 }
 
@@ -1040,7 +1004,7 @@ levelbar block.empty {
 }
 
 levelbar block.filled {
-  background-color: @progress_bg_color;
+  background-color: @accent_bg_color;
 }
 
 levelbar block.filled.low {
@@ -1053,11 +1017,7 @@ levelbar block.filled.full {
 }
 
 progressbar progress,
-progressbar:backdrop progress {
-  background-color: @progress_bg_color;
-  background-image: none;
-}
-
+progressbar:backdrop progress,
 scale highlight,
 switch:checked {
   background-color: @accent_bg_color;

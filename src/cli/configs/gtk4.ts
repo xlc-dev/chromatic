@@ -4,67 +4,55 @@ import type { ColorScheme } from "../../types";
 import { ensureDir, writeConfigFile } from "../utils";
 
 function buildGtkDefineColorBlock(scheme: ColorScheme): string {
+  const border = `mix(${scheme.foreground}, ${scheme.background}, 0.72)`;
+  const base = `mix(${scheme.background}, ${scheme.black}, 0.16)`;
+  const accentBg = `mix(${scheme.blue}, ${scheme.background}, 0.45)`;
   return [
     `@define-color window_bg_color ${scheme.background};`,
     `@define-color window_fg_color ${scheme.foreground};`,
-    `@define-color view_bg_color mix(${scheme.background}, ${scheme.black}, 0.16);`,
+    `@define-color view_bg_color ${base};`,
     `@define-color view_fg_color ${scheme.foreground};`,
-    `@define-color accent_bg_color mix(${scheme.activeBorder}, ${scheme.blue}, 0.45);`,
+    `@define-color accent_bg_color ${accentBg};`,
     `@define-color accent_fg_color ${scheme.foreground};`,
-    `@define-color accent_color ${scheme.activeBorder};`,
-    `@define-color headerbar_bg_color mix(${scheme.background}, ${scheme.black}, 0.28);`,
-    `@define-color headerbar_fg_color mix(${scheme.foreground}, ${scheme.brightWhite}, 0.12);`,
-    `@define-color headerbar_button_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.42);`,
-    `@define-color headerbar_button_hover_bg_color mix(${scheme.background}, ${scheme.cyan}, 0.12);`,
-    `@define-color dialog_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.24);`,
+    `@define-color accent_color ${scheme.blue};`,
+    `@define-color headerbar_bg_color ${scheme.background};`,
+    `@define-color headerbar_fg_color ${scheme.foreground};`,
+    `@define-color dialog_bg_color shade(${scheme.background}, 1.02);`,
     `@define-color dialog_fg_color ${scheme.foreground};`,
-    `@define-color popover_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.28);`,
+    `@define-color popover_bg_color ${scheme.background};`,
     `@define-color popover_fg_color ${scheme.foreground};`,
-    `@define-color popover_shade_color mix(${scheme.background}, ${scheme.brightBlack}, 0.2);`,
-    `@define-color card_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.38);`,
+    `@define-color popover_shade_color mix(${scheme.background}, ${scheme.foreground}, 0.08);`,
+    `@define-color card_bg_color shade(${scheme.background}, 1.03);`,
     `@define-color card_fg_color ${scheme.foreground};`,
-    `@define-color card_shade_color mix(${scheme.background}, ${scheme.brightBlack}, 0.18);`,
-    `@define-color sidebar_bg_color mix(${scheme.background}, ${scheme.blue}, 0.08);`,
-    `@define-color sidebar_fg_color mix(${scheme.foreground}, ${scheme.brightWhite}, 0.08);`,
-    `@define-color sidebar_selected_bg_color mix(${scheme.activeBorder}, ${scheme.blue}, 0.35);`,
-    `@define-color entry_bg_color mix(${scheme.background}, ${scheme.black}, 0.22);`,
-    `@define-color entry_border_color mix(${scheme.inactiveBorder}, ${scheme.blue}, 0.18);`,
-    `@define-color entry_focus_bg_color mix(${scheme.background}, ${scheme.blue}, 0.08);`,
-    `@define-color tab_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.32);`,
-    `@define-color tab_hover_bg_color mix(${scheme.background}, ${scheme.blue}, 0.16);`,
-    `@define-color tab_active_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.62);`,
-    `@define-color tab_active_border_color ${scheme.activeBorder};`,
-    `@define-color selection_bg_color mix(${scheme.activeBorder}, ${scheme.blue}, 0.45);`,
-    `@define-color selection_backdrop_bg_color mix(${scheme.activeBorder}, ${scheme.background}, 0.35);`,
-    `@define-color border_color ${scheme.inactiveBorder};`,
-    `@define-color borders ${scheme.inactiveBorder};`,
-    `@define-color insensitive_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.2);`,
+    `@define-color card_shade_color mix(${scheme.background}, ${scheme.foreground}, 0.08);`,
+    `@define-color sidebar_bg_color shade(${scheme.background}, 0.97);`,
+    `@define-color sidebar_fg_color ${scheme.foreground};`,
+    `@define-color border_color ${border};`,
+    `@define-color borders ${border};`,
+    `@define-color insensitive_bg_color shade(${scheme.background}, 0.98);`,
     `@define-color insensitive_fg_color mix(${scheme.foreground}, ${scheme.background}, 0.5);`,
     `@define-color insensitive_base_color @view_bg_color;`,
-    `@define-color hover_bg_color mix(${scheme.background}, ${scheme.cyan}, 0.12);`,
-    `@define-color button_bg_color mix(${scheme.background}, ${scheme.brightBlack}, 0.46);`,
-    `@define-color button_border_color mix(${scheme.inactiveBorder}, ${scheme.activeBorder}, 0.28);`,
-    `@define-color button_hover_bg_color mix(${scheme.background}, ${scheme.blue}, 0.22);`,
-    `@define-color scrollbar_slider_color mix(${scheme.background}, ${scheme.blue}, 0.26);`,
-    `@define-color scrollbar_slider_hover_color mix(${scheme.background}, ${scheme.cyan}, 0.22);`,
-    `@define-color scrollbar_slider_active_color mix(${scheme.background}, ${scheme.activeBorder}, 0.18);`,
-    `@define-color focus_border_color ${scheme.cyan};`,
-    `@define-color hover_border_color mix(${scheme.inactiveBorder}, ${scheme.cyan}, 0.18);`,
+    `@define-color hover_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.12);`,
+    `@define-color button_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.12);`,
+    `@define-color button_border_color mix(${border}, ${scheme.foreground}, 0.42);`,
+    `@define-color button_hover_bg_color mix(${scheme.background}, ${scheme.foreground}, 0.2);`,
+    `@define-color scrollbar_slider_color mix(${scheme.background}, ${scheme.foreground}, 0.3);`,
+    `@define-color scrollbar_slider_hover_color mix(${scheme.background}, ${scheme.foreground}, 0.42);`,
+    `@define-color scrollbar_slider_active_color mix(${scheme.background}, ${scheme.foreground}, 0.56);`,
+    `@define-color hover_border_color ${border};`,
     `@define-color warning_color ${scheme.yellow};`,
-    `@define-color warning_bg_color mix(${scheme.yellow}, ${scheme.background}, 0.38);`,
+    `@define-color warning_bg_color ${scheme.yellow};`,
     `@define-color warning_fg_color ${scheme.black};`,
-    `@define-color error_color ${scheme.urgentBorder};`,
-    `@define-color error_bg_color mix(${scheme.urgentBorder}, ${scheme.background}, 0.35);`,
+    `@define-color error_color ${scheme.red};`,
+    `@define-color error_bg_color ${scheme.red};`,
     `@define-color error_fg_color ${scheme.white};`,
     `@define-color success_color ${scheme.green};`,
-    `@define-color success_bg_color mix(${scheme.green}, ${scheme.background}, 0.35);`,
+    `@define-color success_bg_color ${scheme.green};`,
     `@define-color success_fg_color ${scheme.black};`,
-    `@define-color attention_color ${scheme.magenta};`,
-    `@define-color destructive_color ${scheme.urgentBorder};`,
-    `@define-color destructive_bg_color mix(${scheme.urgentBorder}, ${scheme.background}, 0.3);`,
+    `@define-color destructive_color ${scheme.red};`,
+    `@define-color destructive_bg_color ${scheme.red};`,
     `@define-color destructive_fg_color ${scheme.white};`,
-    `@define-color progress_bg_color ${scheme.green};`,
-    `@define-color link_color ${scheme.cyan};`,
+    `@define-color link_color ${scheme.blue};`,
     `@define-color visited_link_color ${scheme.magenta};`,
   ].join("\n");
 }
@@ -88,7 +76,7 @@ headerbar menubutton > button,
 windowcontrols > button,
 .titlebar button {
   color: @headerbar_fg_color;
-  background-color: @headerbar_button_bg_color;
+  background-color: @button_bg_color;
   border-color: @button_border_color;
   border-style: solid;
   border-width: 2px;
@@ -179,7 +167,7 @@ headerbar button:hover,
 headerbar menubutton > button:hover,
 windowcontrols > button:hover,
 .titlebar button:hover {
-  background-color: @headerbar_button_hover_bg_color;
+  background-color: @button_hover_bg_color;
   border-color: @hover_border_color;
   background-image: none;
 }
@@ -200,7 +188,7 @@ headerbar button:focus,
 headerbar menubutton > button:focus,
 windowcontrols > button:focus,
 .titlebar button:focus {
-  border-color: @focus_border_color;
+  border-color: @accent_bg_color;
   box-shadow: none;
   outline-color: transparent;
   outline-style: none;
@@ -242,14 +230,6 @@ row,
   color: @view_fg_color;
   background-color: @view_bg_color;
   border-color: @border_color;
-}
-
-entry,
-spinbutton,
-spinbutton text,
-searchbar entry {
-  background-color: @entry_bg_color;
-  border-color: @entry_border_color;
 }
 
 entry,
@@ -504,7 +484,7 @@ notebook > header > tabs {
 
 notebook tab {
   color: @insensitive_fg_color;
-  background-color: @tab_bg_color;
+  background-color: mix(@card_bg_color, @window_fg_color, 0.08);
   border-color: @border_color;
   border-style: solid;
   border-width: 1px;
@@ -516,36 +496,41 @@ notebook tab {
 
 notebook tab:hover {
   color: @window_fg_color;
-  background-color: @tab_hover_bg_color;
+  background-color: mix(@card_bg_color, @window_fg_color, 0.14);
   border-color: @hover_border_color;
 }
 
 notebook tab:checked {
   color: @window_fg_color;
-  background-color: @tab_active_bg_color;
-  border-color: @tab_active_border_color;
+  background-color: @window_bg_color;
+  border-color: @border_color;
+}
+
+notebook tab:checked:backdrop {
+  color: @window_fg_color;
+  background-color: @window_bg_color;
 }
 
 notebook tab:backdrop {
   color: @insensitive_fg_color;
-  background-color: @card_bg_color;
+  background-color: mix(@card_bg_color, @window_fg_color, 0.08);
   border-color: @border_color;
 }
 
 notebook > header.top tab:checked {
-  border-bottom-color: @tab_active_bg_color;
+  border-bottom-color: @window_bg_color;
 }
 
 notebook > header.bottom tab:checked {
-  border-top-color: @tab_active_bg_color;
+  border-top-color: @window_bg_color;
 }
 
 notebook > header.left tab:checked {
-  border-right-color: @tab_active_bg_color;
+  border-right-color: @window_bg_color;
 }
 
 notebook > header.right tab:checked {
-  border-left-color: @tab_active_bg_color;
+  border-left-color: @window_bg_color;
 }
 
 stackswitcher,
@@ -568,7 +553,7 @@ stackswitcher.stack-switcher > button {
 stackswitcher > button:hover,
 stackswitcher.stack-switcher > button:hover {
   color: @window_fg_color;
-  background-color: @tab_hover_bg_color;
+  background-color: mix(@window_bg_color, @window_fg_color, 0.05);
   border-color: mix(@accent_bg_color, @window_bg_color, 0.35);
 }
 
@@ -583,9 +568,8 @@ stackswitcher.stack-switcher > button:checked {
 
 stackswitcher > button.needs-attention,
 stackswitcher.stack-switcher > button.needs-attention {
-  color: @attention_color;
-  background-color: mix(@attention_color, @window_bg_color, 0.08);
-  border-color: @attention_color;
+  color: @window_fg_color;
+  border-color: @warning_color;
 }
 
 listview.separators row,
@@ -786,21 +770,11 @@ scale:focus,
 scale:focus slider,
 switch:focus,
 switch:focus slider {
-  border-color: @focus_border_color;
+  border-color: @accent_bg_color;
   box-shadow: none;
   outline-color: transparent;
   outline-style: none;
   outline-width: 0;
-}
-
-entry:focus,
-entry:focus-within,
-spinbutton:focus,
-spinbutton:focus-within,
-spinbutton text:focus,
-searchbar entry:focus,
-searchbar entry:focus-within {
-  background-color: @entry_focus_bg_color;
 }
 
 listview button:focus,
@@ -812,7 +786,7 @@ columnview check:focus,
 listview radio:focus,
 row radio:focus,
 columnview radio:focus {
-  border-color: @focus_border_color;
+  border-color: @accent_bg_color;
   box-shadow: none;
 }
 
@@ -842,7 +816,7 @@ menubutton > button:disabled {
 
 button.flat,
 menubutton.flat > button {
-  background-color: @card_bg_color;
+  background-color: mix(@button_bg_color, @window_bg_color, 0.45);
   border-color: @button_border_color;
 }
 
@@ -855,16 +829,8 @@ menubutton.destructive-action > button {
 
 button.destructive-action:hover,
 menubutton.destructive-action > button:hover {
-  background-color: @error_bg_color;
-  border-color: @error_color;
-}
-
-label link:link {
-  color: @link_color;
-}
-
-label link:visited {
-  color: @visited_link_color;
+  background-color: mix(@destructive_bg_color, @window_fg_color, 0.12);
+  border-color: mix(@destructive_bg_color, @window_fg_color, 0.12);
 }
 
 selection,
@@ -879,13 +845,13 @@ row:selected:hover,
 listview row:selected,
 listview row:selected:hover {
   color: @accent_fg_color;
-  background-color: @selection_bg_color;
+  background-color: @accent_bg_color;
 }
 
 row:selected:backdrop,
 listview row:selected:backdrop {
   color: @accent_fg_color;
-  background-color: @selection_backdrop_bg_color;
+  background-color: mix(@accent_bg_color, @window_bg_color, 0.35);
 }
 
 popover.background,
@@ -984,14 +950,14 @@ window.dialog actionbar button {
 
 searchbar > revealer > box {
   color: @headerbar_fg_color;
-  background-color: @card_bg_color;
+  background-color: @headerbar_bg_color;
   border-color: @border_color;
   background-image: none;
 }
 
 searchbar entry {
   color: @view_fg_color;
-  background-color: @entry_bg_color;
+  background-color: @view_bg_color;
 }
 
 scrollbar trough {
@@ -1047,7 +1013,7 @@ columnview.navigation-sidebar row:selected:hover,
 .navigation-sidebar row:selected,
 .navigation-sidebar row:selected:hover {
   color: @accent_fg_color;
-  background-color: @sidebar_selected_bg_color;
+  background-color: @accent_bg_color;
   border-color: mix(@accent_bg_color, @window_fg_color, 0.35);
 }
 
@@ -1080,10 +1046,7 @@ entry.error {
 }
 
 progressbar progress,
-progressbar:backdrop progress {
-  background-color: @progress_bg_color;
-}
-
+progressbar:backdrop progress,
 scale highlight,
 switch:checked {
   background-color: @accent_bg_color;
