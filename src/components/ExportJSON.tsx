@@ -1,7 +1,6 @@
 import { createSignal } from "solid-js";
 import { type ColorScheme } from "../types";
 import Button from "./Button";
-import Divider from "./Divider";
 
 interface ExportJSONProps {
   scheme: ColorScheme;
@@ -43,7 +42,7 @@ export default function ExportJSON(props: ExportJSONProps) {
     <div class="p-8 pt-8 relative max-[768px]:p-6 max-[640px]:p-4 max-[640px]:pt-4">
       <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Export Colorscheme</h2>
       <p class="text-[#8b949e] text-xs mb-8 leading-relaxed">
-        Export your colorscheme as JSON and use it with the Chromatic CLI tool to configure your
+        Export your colorscheme as JSON, then use it with the Chromatic CLI tool to configure your
         applications automatically.
       </p>
       <div class="flex gap-4 mb-8 max-[640px]:flex-col">
@@ -58,12 +57,11 @@ export default function ExportJSON(props: ExportJSONProps) {
           {copiedJson() ? "Copied!" : "Copy JSON"}
         </Button>
       </div>
-      <Divider />
       <div>
         <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Chromatic CLI</h2>
         <p class="text-[#8b949e] text-xs mb-4 leading-relaxed">
-          Use the Chromatic CLI tool to configure your applications automatically. Make sure you
-          have it installed somewhere. Download it from the{" "}
+          Run the CLI with your exported colorscheme to configure your applications automatically.
+          Make sure you have it installed somewhere. Download it from the{" "}
           <a
             href="https://github.com/xlc-dev/chromatic/releases"
             target="_blank"
