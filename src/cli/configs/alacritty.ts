@@ -1,5 +1,5 @@
-import { dirname, join } from "path";
 import { homedir } from "os";
+import { dirname, join } from "path";
 import type { ColorScheme } from "../../types";
 import {
   readConfigFile,
@@ -11,7 +11,14 @@ import {
 
 export function configureAlacritty(scheme: ColorScheme, configPath?: string): void {
   const resolvedConfigPath =
-    configPath ?? join(homedir(), ".config", "alacritty", "alacritty.toml");
+    configPath ??
+    (process.platform === "win32"
+      ? join(
+          process.env["APPDATA"] || join(homedir(), "AppData", "Roaming"),
+          "alacritty",
+          "alacritty.toml"
+        )
+      : join(homedir(), ".config", "alacritty", "alacritty.toml"));
 
   ensureDir(dirname(resolvedConfigPath));
   let config = readConfigFile(resolvedConfigPath);

@@ -22,6 +22,7 @@ import { configureDunst } from "./configs/dunst";
 
 type AppGroup = "Editors" | "Terminals" | "Window Managers" | "GTK" | "Other";
 type PathKind = "file" | "dir";
+type Platform = NodeJS.Platform;
 type PathOverrides = Partial<Record<string, string>>;
 
 type AppConfig = {
@@ -31,8 +32,13 @@ type AppConfig = {
   appFlag: string;
   pathFlag: string;
   pathKind: PathKind;
+  platforms: readonly Platform[];
   configure: (scheme: ColorScheme, overridePath?: string) => void;
 };
+
+const LINUX = ["linux"] as const satisfies readonly Platform[];
+const LINUX_MACOS = ["linux", "darwin"] as const satisfies readonly Platform[];
+const DESKTOP = ["linux", "darwin", "win32"] as const satisfies readonly Platform[];
 
 const APPS: AppConfig[] = [
   {
@@ -42,6 +48,7 @@ const APPS: AppConfig[] = [
     appFlag: "--vim",
     pathFlag: "--vim-path",
     pathKind: "file",
+    platforms: DESKTOP,
     configure: configureVim,
   },
   {
@@ -51,6 +58,7 @@ const APPS: AppConfig[] = [
     appFlag: "--vscode",
     pathFlag: "--vscode-path",
     pathKind: "dir",
+    platforms: DESKTOP,
     configure: configureVSCode,
   },
   {
@@ -60,6 +68,7 @@ const APPS: AppConfig[] = [
     appFlag: "--cursor",
     pathFlag: "--cursor-path",
     pathKind: "dir",
+    platforms: DESKTOP,
     configure: configureCursor,
   },
   {
@@ -69,6 +78,7 @@ const APPS: AppConfig[] = [
     appFlag: "--neovim",
     pathFlag: "--neovim-path",
     pathKind: "file",
+    platforms: DESKTOP,
     configure: configureNeovim,
   },
   {
@@ -78,6 +88,7 @@ const APPS: AppConfig[] = [
     appFlag: "--foot",
     pathFlag: "--foot-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureFoot,
   },
   {
@@ -87,6 +98,7 @@ const APPS: AppConfig[] = [
     appFlag: "--alacritty",
     pathFlag: "--alacritty-path",
     pathKind: "file",
+    platforms: DESKTOP,
     configure: configureAlacritty,
   },
   {
@@ -96,6 +108,7 @@ const APPS: AppConfig[] = [
     appFlag: "--kitty",
     pathFlag: "--kitty-path",
     pathKind: "file",
+    platforms: LINUX_MACOS,
     configure: configureKitty,
   },
   {
@@ -105,6 +118,7 @@ const APPS: AppConfig[] = [
     appFlag: "--wezterm",
     pathFlag: "--wezterm-path",
     pathKind: "dir",
+    platforms: DESKTOP,
     configure: configureWezTerm,
   },
   {
@@ -114,6 +128,7 @@ const APPS: AppConfig[] = [
     appFlag: "--xresources",
     pathFlag: "--xresources-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureXresources,
   },
   {
@@ -123,6 +138,7 @@ const APPS: AppConfig[] = [
     appFlag: "--i3",
     pathFlag: "--i3-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureI3,
   },
   {
@@ -132,6 +148,7 @@ const APPS: AppConfig[] = [
     appFlag: "--sway",
     pathFlag: "--sway-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureSway,
   },
   {
@@ -141,6 +158,7 @@ const APPS: AppConfig[] = [
     appFlag: "--river",
     pathFlag: "--river-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureRiver,
   },
   {
@@ -150,6 +168,7 @@ const APPS: AppConfig[] = [
     appFlag: "--hyprland",
     pathFlag: "--hyprland-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureHyprland,
   },
   {
@@ -159,6 +178,7 @@ const APPS: AppConfig[] = [
     appFlag: "--mango",
     pathFlag: "--mango-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureMango,
   },
   {
@@ -168,6 +188,7 @@ const APPS: AppConfig[] = [
     appFlag: "--gtk3",
     pathFlag: "--gtk3-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureGtk3,
   },
   {
@@ -177,6 +198,7 @@ const APPS: AppConfig[] = [
     appFlag: "--gtk4",
     pathFlag: "--gtk4-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureGtk4,
   },
   {
@@ -186,6 +208,7 @@ const APPS: AppConfig[] = [
     appFlag: "--rofi",
     pathFlag: "--rofi-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureRofi,
   },
   {
@@ -195,6 +218,7 @@ const APPS: AppConfig[] = [
     appFlag: "--dunst",
     pathFlag: "--dunst-path",
     pathKind: "file",
+    platforms: LINUX,
     configure: configureDunst,
   },
 ];
@@ -347,7 +371,7 @@ async function main() {
   const hasExplicitFlags = args.some((arg) => appFlags.includes(arg));
   const configAll = args.includes("--all") || !hasExplicitFlags;
   const configs: Array<[boolean, () => void, string]> = APPS.map((app) => [
-    configAll || args.includes(app.appFlag),
+    (configAll && app.platforms.includes(process.platform)) || args.includes(app.appFlag),
     () => app.configure(scheme, pathOverrides[app.key]),
     app.name,
   ]);

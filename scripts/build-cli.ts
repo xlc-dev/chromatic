@@ -1,4 +1,13 @@
-import { chmodSync, mkdirSync, writeFileSync } from "fs";
+import {
+  chmodSync,
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "fs";
+import { tmpdir } from "os";
 import { basename, join } from "path";
 import { CLI_ENTRY, CLI_TARGETS, DIST_DIR, getCliTarget } from "./cli-targets";
 
@@ -11,44 +20,56 @@ async function sha256sumLine(filePath: string): Promise<string> {
 
 async function buildTarget(target: (typeof CLI_TARGETS)[number]): Promise<void> {
   const outfile = join(DIST_DIR, target.outfile);
+  const buildDir = mkdtempSync(join(tmpdir(), "chromatic-cli-"));
+  const buildOutfile = join(buildDir, target.outfile);
   console.log(`Building ${target.id} -> ${outfile}`);
 
-  const proc = Bun.spawn(
-    [
-      "bun",
-      "build",
-      "--compile",
-      "--minify",
-      `--target=${target.bunTarget}`,
-      CLI_ENTRY,
-      `--outfile=${outfile}`,
-    ],
-    { stdout: "inherit", stderr: "inherit" }
-  );
+  try {
+    const proc = Bun.spawn(
+      [
+        "bun",
+        "build",
+        "--compile",
+        "--minify",
+        `--target=${target.bunTarget}`,
+        CLI_ENTRY,
+        `--outfile=${buildOutfile}`,
+      ],
+      { stdout: "inherit", stderr: "inherit" }
+    );
 
-  const code = await proc.exited;
-  if (code !== 0) {
-    console.error(`Build failed for ${target.id} (exit ${code})`);
-    process.exit(code);
+    const code = await proc.exited;
+    if (code !== 0) {
+      console.error(`Build failed for ${target.id} (exit ${code})`);
+      process.exit(code);
+    }
+    if (!existsSync(buildOutfile)) {
+      console.error(`Build failed for ${target.id}: missing output ${buildOutfile}`);
+      process.exit(1);
+    }
+    copyFileSync(buildOutfile, outfile);
+  } finally {
+    rmSync(buildDir, { force: true, recursive: true });
   }
 }
 
 const filterId = process.argv[2];
-const targets = filterId
-  ? (() => {
-      const target = getCliTarget(filterId);
-      if (!target) {
-        console.error(`Unknown CLI target: ${filterId}`);
-        console.error(`Available: ${CLI_TARGETS.map((t) => t.id).join(", ")}`);
-        process.exit(1);
-      }
-      return [target];
-    })()
-  : CLI_TARGETS;
+let targets = CLI_TARGETS;
+if (filterId) {
+  const target = getCliTarget(filterId);
+  if (!target) {
+    console.error(`Unknown CLI target: ${filterId}`);
+    console.error(`Available: ${CLI_TARGETS.map((t) => t.id).join(", ")}`);
+    process.exit(1);
+  }
+  targets = [target];
+}
 
 mkdirSync(DIST_DIR, { recursive: true });
 
-await Promise.all(targets.map((t) => buildTarget(t)));
+for (const target of targets) {
+  await buildTarget(target);
+}
 
 if (targets.length === CLI_TARGETS.length) {
   const names = CLI_TARGETS.map((t) => t.outfile);

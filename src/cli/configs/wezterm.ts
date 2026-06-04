@@ -11,7 +11,7 @@ import {
 
 export function configureWezTerm(scheme: ColorScheme, configDir?: string): void {
   const dirName = "wezterm";
-  const baseDir = configDir ?? join(homedir(), ".config");
+  const baseDir = configDir ?? join(homedir(), ".config", "wezterm");
   const resolvedConfigDir = basename(baseDir) === dirName ? baseDir : join(baseDir, dirName);
   const colorsDir = join(resolvedConfigDir, "colors");
   const schemePath = join(colorsDir, "chromatic.toml");

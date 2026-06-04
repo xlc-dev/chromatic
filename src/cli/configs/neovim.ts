@@ -1,5 +1,5 @@
-import { dirname, join } from "path";
 import { homedir } from "os";
+import { dirname, join } from "path";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, type ConfigUpdate } from "../utils";
 
@@ -79,6 +79,10 @@ export function configureNeovim(scheme: ColorScheme, configPath?: string): void 
     },
   ];
 
-  const resolvedConfigPath = configPath ?? join(homedir(), ".config", "nvim", "init.vim");
+  const resolvedConfigPath =
+    configPath ??
+    (process.platform === "win32"
+      ? join(process.env["LOCALAPPDATA"] || join(homedir(), "AppData", "Local"), "nvim", "init.vim")
+      : join(homedir(), ".config", "nvim", "init.vim"));
   updateConfigFile(resolvedConfigPath, dirname(resolvedConfigPath), updates);
 }

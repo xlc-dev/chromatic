@@ -1,5 +1,5 @@
-import { join } from "path";
 import { homedir } from "os";
+import { join } from "path";
 import type { ColorScheme } from "../../types";
 import { updateConfigFile, type ConfigUpdate } from "../utils";
 
@@ -79,6 +79,8 @@ export function configureVim(scheme: ColorScheme, configPath?: string): void {
     },
   ];
 
-  const resolvedConfigPath = configPath ?? join(homedir(), ".vimrc");
+  const resolvedConfigPath =
+    configPath ??
+    (process.platform === "win32" ? join(homedir(), "_vimrc") : join(homedir(), ".vimrc"));
   updateConfigFile(resolvedConfigPath, null, updates);
 }
