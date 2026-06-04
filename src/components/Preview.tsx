@@ -151,6 +151,9 @@ const languageOptions: Array<{ value: Language; label: string }> = [
   { value: "c", label: "C" },
   { value: "cpp", label: "C++" },
   { value: "zig", label: "Zig" },
+  { value: "shell", label: "Shell" },
+  { value: "lua", label: "Lua" },
+  { value: "ruby", label: "Ruby" },
 ];
 
 export default function Preview(props: PreviewProps) {
