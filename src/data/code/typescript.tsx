@@ -1,21 +1,30 @@
 // @ts-nocheck
 import { createSignal, createEffect } from "solid-js";
-import type { ColorScheme } from "./types";
 
-interface AppProps {
-  initialScheme?: ColorScheme;
+interface ColorScheme {
+  name: string;
+  background: string;
+  foreground: string;
+  red: string;
 }
 
-export default function App(props: AppProps) {
-  const [scheme, setScheme] = createSignal<ColorScheme>(props.initialScheme ?? defaultColorScheme);
+const defaultScheme: ColorScheme = {
+  name: "Chromatic Default",
+  background: "#0c0c0c",
+  foreground: "#cccccc",
+  red: "#cd3131",
+};
+
+export default function App() {
+  const [scheme] = createSignal<ColorScheme>(defaultScheme);
 
   createEffect(() => {
     localStorage.setItem("scheme", JSON.stringify(scheme()));
   });
 
   return (
-    <div class="app">
-      <Preview scheme={scheme()} />
+    <div class="preview" style={{ color: scheme().foreground, background: scheme().background }}>
+      {scheme().name}
     </div>
   );
 }

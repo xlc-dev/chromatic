@@ -5,23 +5,34 @@
 
 class ColorScheme {
 private:
+    std::string name;
     std::string background;
     std::string foreground;
+    std::string red;
 
 public:
-    ColorScheme(const std::string& bg, const std::string& fg)
-        : background(bg), foreground(fg) {}
+    ColorScheme()
+        : name("Chromatic Default"),
+          background("#0c0c0c"),
+          foreground("#cccccc"),
+          red("#cd3131") {}
 
     std::map<std::string, std::string> to_map() const {
         std::map<std::string, std::string> result;
+        result["name"] = name;
         result["background"] = background;
         result["foreground"] = foreground;
+        result["red"] = red;
         return result;
+    }
+
+    std::string preview() const {
+        return name + ": " + foreground + " on " + background;
     }
 };
 
 int main() {
-    ColorScheme scheme("#0c0c0c", "#cccccc");
-    std::cout << "Background: " << scheme.to_map()["background"] << std::endl;
+    ColorScheme scheme;
+    std::cout << scheme.preview() << std::endl;
     return 0;
 }

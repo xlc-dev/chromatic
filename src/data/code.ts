@@ -7,6 +7,9 @@ import goCode from "./code/go.go?raw";
 import cCode from "./code/c.c?raw";
 import cppCode from "./code/cpp.cpp?raw";
 import zigCode from "./code/zig.zig?raw";
+import shellCode from "./code/shell.sh?raw";
+import luaCode from "./code/lua.lua?raw";
+import rubyCode from "./code/ruby.rb?raw";
 
 export interface CodeExample {
   filename: string;
@@ -22,7 +25,10 @@ export type Language =
   | "c"
   | "cpp"
   | "zig"
-  | "java";
+  | "java"
+  | "shell"
+  | "lua"
+  | "ruby";
 
 const codeExamples: Record<Language, CodeExample> = {
   typescript: {
@@ -60,6 +66,18 @@ const codeExamples: Record<Language, CodeExample> = {
   zig: {
     filename: "main.zig",
     code: zigCode,
+  },
+  shell: {
+    filename: "main.sh",
+    code: shellCode,
+  },
+  lua: {
+    filename: "main.lua",
+    code: luaCode,
+  },
+  ruby: {
+    filename: "main.rb",
+    code: rubyCode,
   },
 };
 

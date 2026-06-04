@@ -1,20 +1,17 @@
 // @ts-nocheck
 import { createSignal } from "solid-js";
 
-function createColorScheme(name, colors) {
+function createColorScheme() {
   return {
-    name,
-    ...colors,
-    createdAt: new Date(),
+    name: "Chromatic Default",
+    background: "#0c0c0c",
+    foreground: "#cccccc",
+    red: "#cd3131",
   };
 }
 
 function App() {
-  const [scheme, setScheme] = createSignal(defaultColorScheme);
+  const [scheme] = createSignal(createColorScheme());
 
-  const handleColorChange = (key, value) => {
-    setScheme((prev) => ({ ...prev, [key]: value }));
-  };
-
-  return <Preview scheme={scheme()} />;
+  return <pre>{JSON.stringify(scheme(), null, 2)}</pre>;
 }

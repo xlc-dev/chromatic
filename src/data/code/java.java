@@ -1,28 +1,39 @@
 // @ts-nocheck
-import java.awt.Color;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        ColorScheme lightTheme = new ColorScheme(Color.WHITE, Color.BLACK);
-
-        System.out.println(lightTheme);
+        ColorScheme scheme = ColorScheme.createDefault();
+        System.out.println(scheme.preview());
     }
 }
 
-public class ColorScheme {
-    private Color background;
-    private Color foreground;
+class ColorScheme {
+    private final String name;
+    private final String background;
+    private final String foreground;
+    private final String red;
 
-    public ColorScheme(Color background, Color foreground) {
+    ColorScheme(String name, String background, String foreground, String red) {
+        this.name = name;
         this.background = background;
         this.foreground = foreground;
+        this.red = red;
     }
 
-    @Override
-    public String toString() {
-        return "ColorScheme{" +
-                "background=" + background +
-                ", foreground=" + foreground +
-                '}';
+    static ColorScheme createDefault() {
+        return new ColorScheme("Chromatic Default", "#0c0c0c", "#cccccc", "#cd3131");
+    }
+
+    Map<String, String> toMap() {
+        return Map.of(
+                "name", name,
+                "background", background,
+                "foreground", foreground,
+                "red", red);
+    }
+
+    String preview() {
+        return name + ": " + foreground + " on " + background;
     }
 }
