@@ -1,24 +1,6 @@
 import { readFileSync, existsSync, statSync } from "fs";
 import { createInterface } from "readline";
 import type { ColorScheme } from "../types";
-import { configureVim } from "./configs/vim";
-import { configureVSCode } from "./configs/vscode";
-import { configureCursor } from "./configs/cursor";
-import { configureNeovim } from "./configs/neovim";
-import { configureFoot } from "./configs/foot";
-import { configureAlacritty } from "./configs/alacritty";
-import { configureKitty } from "./configs/kitty";
-import { configureWezTerm } from "./configs/wezterm";
-import { configureXresources } from "./configs/xresources";
-import { configureI3 } from "./configs/i3";
-import { configureSway } from "./configs/sway";
-import { configureRiver } from "./configs/river";
-import { configureHyprland } from "./configs/hyprland";
-import { configureMango } from "./configs/mango";
-import { configureGtk3 } from "./configs/gtk3";
-import { configureGtk4 } from "./configs/gtk4";
-import { configureRofi } from "./configs/rofi";
-import { configureDunst } from "./configs/dunst";
 
 type AppGroup = "Editors" | "Terminals" | "Window Managers" | "GTK" | "Other";
 type PathKind = "file" | "dir";
@@ -33,12 +15,12 @@ type AppConfig = {
   pathFlag: string;
   pathKind: PathKind;
   platforms: readonly Platform[];
-  configure: (scheme: ColorScheme, overridePath?: string) => void;
+  configure: (scheme: ColorScheme, overridePath?: string) => Promise<void>;
 };
 
 const LINUX = ["linux"] as const satisfies readonly Platform[];
 const LINUX_MACOS = ["linux", "darwin"] as const satisfies readonly Platform[];
-const DESKTOP = ["linux", "darwin", "win32"] as const satisfies readonly Platform[];
+const ALL_PLATFORMS = ["linux", "darwin", "win32"] as const satisfies readonly Platform[];
 
 const APPS: AppConfig[] = [
   {
@@ -48,8 +30,9 @@ const APPS: AppConfig[] = [
     appFlag: "--vim",
     pathFlag: "--vim-path",
     pathKind: "file",
-    platforms: DESKTOP,
-    configure: configureVim,
+    platforms: ALL_PLATFORMS,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/vim")).configureVim(scheme, overridePath),
   },
   {
     key: "vscode",
@@ -58,8 +41,9 @@ const APPS: AppConfig[] = [
     appFlag: "--vscode",
     pathFlag: "--vscode-path",
     pathKind: "dir",
-    platforms: DESKTOP,
-    configure: configureVSCode,
+    platforms: ALL_PLATFORMS,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/vscode")).configureVSCode(scheme, overridePath),
   },
   {
     key: "cursor",
@@ -68,8 +52,9 @@ const APPS: AppConfig[] = [
     appFlag: "--cursor",
     pathFlag: "--cursor-path",
     pathKind: "dir",
-    platforms: DESKTOP,
-    configure: configureCursor,
+    platforms: ALL_PLATFORMS,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/cursor")).configureCursor(scheme, overridePath),
   },
   {
     key: "neovim",
@@ -78,8 +63,9 @@ const APPS: AppConfig[] = [
     appFlag: "--neovim",
     pathFlag: "--neovim-path",
     pathKind: "file",
-    platforms: DESKTOP,
-    configure: configureNeovim,
+    platforms: ALL_PLATFORMS,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/neovim")).configureNeovim(scheme, overridePath),
   },
   {
     key: "foot",
@@ -89,7 +75,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--foot-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureFoot,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/foot")).configureFoot(scheme, overridePath),
   },
   {
     key: "alacritty",
@@ -98,8 +85,9 @@ const APPS: AppConfig[] = [
     appFlag: "--alacritty",
     pathFlag: "--alacritty-path",
     pathKind: "file",
-    platforms: DESKTOP,
-    configure: configureAlacritty,
+    platforms: ALL_PLATFORMS,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/alacritty")).configureAlacritty(scheme, overridePath),
   },
   {
     key: "kitty",
@@ -109,7 +97,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--kitty-path",
     pathKind: "file",
     platforms: LINUX_MACOS,
-    configure: configureKitty,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/kitty")).configureKitty(scheme, overridePath),
   },
   {
     key: "wezterm",
@@ -118,8 +107,9 @@ const APPS: AppConfig[] = [
     appFlag: "--wezterm",
     pathFlag: "--wezterm-path",
     pathKind: "dir",
-    platforms: DESKTOP,
-    configure: configureWezTerm,
+    platforms: ALL_PLATFORMS,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/wezterm")).configureWezTerm(scheme, overridePath),
   },
   {
     key: "xresources",
@@ -129,7 +119,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--xresources-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureXresources,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/xresources")).configureXresources(scheme, overridePath),
   },
   {
     key: "i3",
@@ -139,7 +130,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--i3-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureI3,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/i3")).configureI3(scheme, overridePath),
   },
   {
     key: "sway",
@@ -149,7 +141,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--sway-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureSway,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/sway")).configureSway(scheme, overridePath),
   },
   {
     key: "river",
@@ -159,7 +152,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--river-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureRiver,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/river")).configureRiver(scheme, overridePath),
   },
   {
     key: "hyprland",
@@ -169,7 +163,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--hyprland-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureHyprland,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/hyprland")).configureHyprland(scheme, overridePath),
   },
   {
     key: "mango",
@@ -179,7 +174,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--mango-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureMango,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/mango")).configureMango(scheme, overridePath),
   },
   {
     key: "gtk3",
@@ -189,7 +185,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--gtk3-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureGtk3,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/gtk3")).configureGtk3(scheme, overridePath),
   },
   {
     key: "gtk4",
@@ -199,7 +196,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--gtk4-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureGtk4,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/gtk4")).configureGtk4(scheme, overridePath),
   },
   {
     key: "rofi",
@@ -209,7 +207,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--rofi-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureRofi,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/rofi")).configureRofi(scheme, overridePath),
   },
   {
     key: "dunst",
@@ -219,7 +218,8 @@ const APPS: AppConfig[] = [
     pathFlag: "--dunst-path",
     pathKind: "file",
     platforms: LINUX,
-    configure: configureDunst,
+    configure: async (scheme, overridePath) =>
+      (await import("./configs/dunst")).configureDunst(scheme, overridePath),
   },
 ];
 
@@ -370,7 +370,7 @@ async function main() {
 
   const hasExplicitFlags = args.some((arg) => appFlags.includes(arg));
   const configAll = args.includes("--all") || !hasExplicitFlags;
-  const configs: Array<[boolean, () => void, string]> = APPS.map((app) => [
+  const configs: Array<[boolean, () => Promise<void>, string]> = APPS.map((app) => [
     (configAll && app.platforms.includes(process.platform)) || args.includes(app.appFlag),
     () => app.configure(scheme, pathOverrides[app.key]),
     app.name,
@@ -396,12 +396,12 @@ async function main() {
   }
 
   console.log("Configuring colorscheme...\n");
-  configs.forEach(([shouldRun, configure, name]) => {
+  for (const [shouldRun, configure, name] of configs) {
     if (shouldRun) {
-      configure();
+      await configure();
       console.log(`✓ Configured ${name}`);
     }
-  });
+  }
 }
 
 try {

@@ -1,12 +1,4 @@
-import {
-  chmodSync,
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from "fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
 import { basename, join } from "path";
 import { CLI_ENTRY, CLI_TARGETS, DIST_DIR, getCliTarget } from "./cli-targets";
@@ -47,7 +39,9 @@ async function buildTarget(target: (typeof CLI_TARGETS)[number]): Promise<void> 
       console.error(`Build failed for ${target.id}: missing output ${buildOutfile}`);
       process.exit(1);
     }
-    copyFileSync(buildOutfile, outfile);
+    await Bun.write(outfile, Bun.file(buildOutfile));
+    chmodSync(outfile, 0o755);
+    writeFileSync(`${outfile}.sha256`, await sha256sumLine(outfile));
   } finally {
     rmSync(buildDir, { force: true, recursive: true });
   }
@@ -69,31 +63,6 @@ mkdirSync(DIST_DIR, { recursive: true });
 
 for (const target of targets) {
   await buildTarget(target);
-}
-
-if (targets.length === CLI_TARGETS.length) {
-  const names = CLI_TARGETS.map((t) => t.outfile);
-
-  for (const name of names) {
-    const path = join(DIST_DIR, name);
-    chmodSync(path, 0o755);
-    writeFileSync(`${path}.sha256`, await sha256sumLine(path));
-  }
-
-  const tarName = "chromatic-all.tar.gz";
-  const tarProc = Bun.spawn(["tar", "-czf", tarName, ...names], {
-    cwd: DIST_DIR,
-    stdout: "inherit",
-    stderr: "inherit",
-  });
-
-  if ((await tarProc.exited) !== 0) {
-    console.error("Failed to create chromatic-all.tar.gz");
-    process.exit(1);
-  }
-
-  const tarPath = join(DIST_DIR, tarName);
-  writeFileSync(`${tarPath}.sha256`, await sha256sumLine(tarPath));
 }
 
 console.log(`Built ${targets.length} CLI binary(s) in ${DIST_DIR}/`);
