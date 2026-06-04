@@ -1,20 +1,10 @@
 import type { ColorSchemeKey } from "../types";
+import type { Language } from "../data/code";
 
 export interface CodeToken {
   text: string;
   color: ColorSchemeKey;
 }
-
-type Language =
-  | "typescript"
-  | "python"
-  | "rust"
-  | "go"
-  | "javascript"
-  | "c"
-  | "cpp"
-  | "zig"
-  | "java";
 
 const controlFlowKeywords: Record<Language, Set<string>> = {
   typescript: new Set([
@@ -161,6 +151,53 @@ const controlFlowKeywords: Record<Language, Set<string>> = {
     "defer",
     "errdefer",
   ]),
+  shell: new Set([
+    "if",
+    "then",
+    "else",
+    "elif",
+    "fi",
+    "for",
+    "while",
+    "do",
+    "done",
+    "case",
+    "esac",
+    "return",
+    "exit",
+  ]),
+  lua: new Set([
+    "if",
+    "then",
+    "else",
+    "elseif",
+    "end",
+    "for",
+    "while",
+    "repeat",
+    "until",
+    "do",
+    "return",
+    "break",
+  ]),
+  ruby: new Set([
+    "if",
+    "elsif",
+    "else",
+    "unless",
+    "case",
+    "when",
+    "while",
+    "until",
+    "for",
+    "begin",
+    "rescue",
+    "ensure",
+    "return",
+    "yield",
+    "break",
+    "next",
+  ]),
 };
 
 const typeKeywords: Record<Language, Set<string>> = {
@@ -196,6 +233,9 @@ const typeKeywords: Record<Language, Set<string>> = {
   c: new Set(["struct", "typedef", "union", "enum"]),
   cpp: new Set(["class", "struct", "enum", "template", "typename", "using", "namespace"]),
   zig: new Set(["struct", "enum", "union", "error", "type", "anytype", "anyframe"]),
+  shell: new Set(["function", "local", "declare", "readonly"]),
+  lua: new Set(["function", "local", "nil", "true", "false"]),
+  ruby: new Set(["class", "module", "def", "end", "self", "nil", "true", "false"]),
 };
 
 const modifierKeywords: Record<Language, Set<string>> = {
@@ -312,6 +352,18 @@ const modifierKeywords: Record<Language, Set<string>> = {
     "inline",
     "noinline",
   ]),
+  shell: new Set(["set", "export", "source", "readonly", "local"]),
+  lua: new Set(["local", "and", "or", "not", "in"]),
+  ruby: new Set([
+    "require",
+    "include",
+    "extend",
+    "private",
+    "public",
+    "protected",
+    "attr_reader",
+    "attr_accessor",
+  ]),
 };
 
 const literalKeywords: Record<Language, Set<string>> = {
@@ -324,6 +376,9 @@ const literalKeywords: Record<Language, Set<string>> = {
   c: new Set([]),
   cpp: new Set([]),
   zig: new Set(["true", "false", "null", "undefined"]),
+  shell: new Set(["true", "false"]),
+  lua: new Set(["true", "false", "nil"]),
+  ruby: new Set(["true", "false", "nil"]),
 };
 
 const builtins: Record<Language, Set<string>> = {
@@ -393,6 +448,9 @@ const builtins: Record<Language, Set<string>> = {
   c: new Set(["printf", "scanf", "malloc", "free", "strlen", "strcpy", "strcmp", "strdup"]),
   cpp: new Set(["std", "cout", "cin", "endl", "string", "vector", "map", "unordered_map"]),
   zig: new Set(["std", "std.debug.print", "std.mem", "std.ArrayList", "std.HashMap"]),
+  shell: new Set(["printf", "echo", "cat", "jq"]),
+  lua: new Set(["print", "pairs", "ipairs", "string", "table"]),
+  ruby: new Set(["puts", "Hash", "String", "Array", "JSON"]),
 };
 
 function isWhitespace(char: string): boolean {
@@ -497,7 +555,12 @@ function tokenizeComment(
   const twoChars = code.slice(start, start + 2);
 
   const startChar = code[start];
-  if (twoChars === "//" || twoChars === "# " || (lang === "python" && startChar === "#")) {
+  if (
+    twoChars === "//" ||
+    (lang === "lua" && twoChars === "--") ||
+    twoChars === "# " ||
+    ((lang === "python" || lang === "shell" || lang === "ruby") && startChar === "#")
+  ) {
     let text = "";
     let i = start;
     while (i < code.length) {
