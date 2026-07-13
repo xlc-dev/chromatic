@@ -191,9 +191,9 @@ export default function App() {
           </div>
         </div>
       </header>
-      <main class="flex-1 grid grid-cols-2 gap-8 p-8 max-w-[1600px] mx-auto w-full box-border max-[1400px]:p-6 max-[1400px]:gap-6 max-[1200px]:p-5 max-[1200px]:gap-5 max-[1024px]:grid-cols-1 max-[1024px]:p-6 max-[1024px]:gap-6 max-[768px]:p-4 max-[768px]:gap-4 max-[640px]:p-3 max-[640px]:gap-3">
-        <div class="flex flex-col gap-6">
-          <div class="bg-[#161b22] rounded-lg border border-[#30363d] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.3)] max-h-[calc(100vh-200px)] flex flex-col overflow-y-auto relative max-[1024px]:max-h-[calc(100vh-250px)] max-[768px]:max-h-[calc(100vh-220px)]">
+      <main class="flex-1 grid grid-cols-2 items-stretch gap-8 p-8 max-w-[1600px] mx-auto w-full box-border max-[1400px]:p-6 max-[1400px]:gap-6 max-[1200px]:p-5 max-[1200px]:gap-5 max-[1024px]:grid-cols-1 max-[1024px]:p-6 max-[1024px]:gap-6 max-[768px]:p-4 max-[768px]:gap-4 max-[640px]:p-3 max-[640px]:gap-3">
+        <div class="min-h-0">
+          <div class="app-panel h-full min-h-[600px] flex flex-col overflow-y-auto relative">
             {activeTab() === "preview" ? (
               <ColorPicker scheme={scheme()} onColorChange={handleColorChange} />
             ) : (
@@ -204,7 +204,7 @@ export default function App() {
             )}
           </div>
         </div>
-        <div>
+        <div class="min-h-0">
           <Preview scheme={scheme()} />
         </div>
       </main>

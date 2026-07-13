@@ -218,9 +218,7 @@ export default function ColorPicker(props: ColorPickerProps) {
     <>
       <div class="p-6 relative flex flex-col gap-6 flex-1 min-h-0 max-[768px]:p-5 max-[640px]:p-4 max-[640px]:gap-4">
         <div class="flex flex-col gap-3">
-          <h3 class="text-[#c9d1d9] text-lg font-semibold uppercase tracking-wide m-0">
-            Terminal Colors
-          </h3>
+          <h3 class="section-heading">Terminal Colors</h3>
           <div class="grid grid-cols-8 gap-2 max-[1400px]:grid-cols-4 max-[1024px]:grid-cols-4 max-[768px]:grid-cols-2 max-[640px]:grid-cols-2">
             <For each={colorNames}>
               {(color) => (
@@ -238,9 +236,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         </div>
 
         <div class="flex flex-col gap-3">
-          <h3 class="text-[#c9d1d9] text-lg font-semibold uppercase tracking-wide m-0">
-            Base Colors
-          </h3>
+          <h3 class="section-heading">Base Colors</h3>
           <div class="grid grid-cols-2 gap-2 max-[1024px]:grid-cols-1">
             <div data-color-key="background">
               <ColorSwatch
@@ -262,9 +258,7 @@ export default function ColorPicker(props: ColorPickerProps) {
         </div>
 
         <div class="flex flex-col gap-3">
-          <h3 class="text-[#c9d1d9] text-lg font-semibold uppercase tracking-wide m-0">
-            Window Borders
-          </h3>
+          <h3 class="section-heading">Window Borders</h3>
           <div class="grid grid-cols-3 gap-2 max-[768px]:grid-cols-2 max-[640px]:grid-cols-2">
             <div data-color-key="activeBorder">
               <ColorSwatch
@@ -327,7 +321,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div class="flex items-center justify-between py-4 px-5 border-b border-[#30363d]">
-                  <span class="text-[#c9d1d9] text-sm font-semibold">Pick Color</span>
+                  <span class="section-heading">Pick Color</span>
                   <button
                     class="bg-transparent border-0 text-[#8b949e] text-2xl leading-none cursor-pointer p-1 w-8 h-8 flex items-center justify-center rounded transition-all duration-200 font-light hover:bg-[#21262d] hover:text-[#c9d1d9]"
                     onClick={closePicker}
@@ -419,7 +413,7 @@ export default function ColorPicker(props: ColorPickerProps) {
 
                         return (
                           <div class="flex-1 flex items-center gap-1 min-w-0">
-                            <label class="text-[#8b949e] text-sm font-medium flex-shrink-0">
+                            <label class="text-[#8b949e] text-xs font-medium uppercase tracking-wide flex-shrink-0">
                               {inputProps.label}:
                             </label>
                             <div class="flex-1 flex items-stretch bg-[#0d1117] border border-[#30363d] rounded overflow-hidden min-w-0 focus-within:border-[#58a6ff]">
@@ -472,7 +466,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                             style={{ "background-color": hex }}
                           />
                           <div class="flex items-center gap-2">
-                            <label class="text-[#8b949e] text-sm font-medium min-w-[40px]">
+                            <label class="text-[#8b949e] text-xs font-medium uppercase tracking-wide min-w-[40px]">
                               Hex:
                             </label>
                             <div class="relative flex-1 flex items-center">
@@ -502,7 +496,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                                     props.onColorChange(state().key, fullHex);
                                   }
                                 }}
-                                class="flex-1 bg-[#0d1117] border border-[#30363d] rounded px-2 py-2 pl-6 text-[#c9d1d9] font-mono text-sm transition-[border-color] duration-200 focus:outline-none focus:border-[#58a6ff]"
+                                class="control flex-1 bg-[#0d1117] px-2 pl-6 text-[#c9d1d9] font-mono transition-[border-color] duration-200 focus:outline-none focus:border-[#58a6ff]"
                               />
                             </div>
                           </div>

@@ -245,17 +245,17 @@ export default function Preview(props: PreviewProps) {
 
   return (
     <div
-      class="chromatic-preview-scroll bg-[#161b22] rounded-lg border border-[#30363d] shadow-[0_1px_3px_rgba(0,0,0,0.3)] p-8 relative overflow-hidden min-h-[600px] max-[768px]:p-6 max-[640px]:p-4"
+      class="chromatic-preview-scroll app-panel h-full min-h-[600px] p-6 relative overflow-hidden max-[640px]:p-4"
       style={{
         "--preview-scrollbar-track": props.scheme.black,
         "--preview-scrollbar-thumb": props.scheme.brightBlack,
       }}
     >
       <div class="absolute inset-0 rounded-lg p-px bg-gradient-to-br from-[#58a6ff33] via-[#bc8cff33] via-[#f8514933] to-[#3fb95033] pointer-events-none opacity-0 transition-opacity duration-300 hover:opacity-100 [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [-webkit-mask-composite:xor] [mask-composite:exclude]"></div>
-      <div class="flex justify-between items-start mb-8 gap-8 max-[1200px]:flex-col max-[1200px]:items-start max-[1200px]:gap-4">
+      <div class="flex justify-between items-start mb-6 gap-6 max-[1200px]:flex-col max-[1200px]:items-start max-[1200px]:gap-4">
         <div>
-          <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Colorscheme Preview</h2>
-          <p class="text-[#8b949e] text-xs mb-0 leading-relaxed max-w-md">
+          <h2 class="section-heading mb-3">Colorscheme Preview</h2>
+          <p class="panel-copy max-w-md">
             Sample editor and terminal using your palette. This is not a 1-1 representation. Your
             real apps may look a bit different depending on font, highlighter parser, type of
             application, etc.
@@ -265,10 +265,12 @@ export default function Preview(props: PreviewProps) {
           class="flex items-center gap-2 flex-shrink-0 relative max-[1200px]:w-full"
           ref={dropdownRef}
         >
-          <label class="text-[#8b949e] text-sm font-medium">Language:</label>
+          <label class="text-[#8b949e] text-xs font-medium uppercase tracking-wide">
+            Language:
+          </label>
           <div class="relative">
             <button
-              class="px-3 py-2 rounded text-sm cursor-pointer transition-all duration-200 font-mono flex items-center gap-2 min-w-[140px] justify-between"
+              class="control px-3 font-mono flex items-center gap-2 min-w-[140px] justify-between cursor-pointer transition-all duration-200"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsDropdownOpen(!isDropdownOpen());
@@ -330,9 +332,9 @@ export default function Preview(props: PreviewProps) {
         </div>
       </div>
 
-      <div class="relative w-full min-h-[600px] mt-8 max-[1024px]:min-h-[500px] max-[768px]:min-h-[450px] max-[768px]:mt-6 max-[640px]:min-h-[400px] max-[640px]:mt-4">
+      <div class="relative w-full min-h-[600px] mt-6 max-[1024px]:min-h-[500px] max-[768px]:min-h-[450px] max-[640px]:min-h-[400px] max-[640px]:mt-4">
         <div
-          class={`absolute border-2 rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden w-[70%] h-[80%] top-[2%] left-[3%] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.6)] max-[1024px]:w-[85%] max-[1024px]:h-[55%] max-[1024px]:top-[5%] max-[1024px]:left-[5%] max-[768px]:w-[90%] max-[768px]:h-[50%] max-[768px]:top-[5%] max-[768px]:left-[5%] max-[640px]:w-[95%] max-[640px]:h-[45%] ${
+          class={`preview-window absolute w-[76%] h-[68%] top-[4%] left-[4%] max-[1024px]:w-[85%] max-[1024px]:h-[55%] max-[1024px]:top-[5%] max-[1024px]:left-[5%] max-[768px]:w-[90%] max-[768px]:h-[50%] max-[768px]:top-[5%] max-[768px]:left-[5%] max-[640px]:w-[95%] max-[640px]:h-[45%] ${
             activeWindow() === "editor"
               ? "z-[2] shadow-[0_12px_32px_rgba(0,0,0,0.6)]"
               : "z-[1] opacity-95"
@@ -381,7 +383,7 @@ export default function Preview(props: PreviewProps) {
         </div>
 
         <div
-          class={`absolute border-2 rounded-lg shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex flex-col overflow-hidden w-[65%] h-[70%] top-[20%] right-[3%] hover:-translate-y-0.5 hover:shadow-[0_12px_32px_rgba(0,0,0,0.6)] max-[1024px]:w-[80%] max-[1024px]:h-[50%] max-[1024px]:top-[50%] max-[1024px]:right-[5%] max-[768px]:w-[85%] max-[768px]:h-[45%] max-[768px]:top-[55%] max-[768px]:right-[5%] max-[640px]:w-[95%] max-[640px]:h-[40%] max-[640px]:top-[50%] ${
+          class={`preview-window absolute w-[76%] h-[68%] top-[28%] right-[4%] max-[1024px]:w-[85%] max-[1024px]:h-[55%] max-[1024px]:top-[45%] max-[1024px]:right-[5%] max-[768px]:w-[90%] max-[768px]:h-[50%] max-[768px]:top-[50%] max-[768px]:right-[5%] max-[640px]:w-[95%] max-[640px]:h-[45%] max-[640px]:top-[50%] ${
             activeWindow() === "terminal"
               ? "z-[2] shadow-[0_12px_32px_rgba(0,0,0,0.6)]"
               : "z-[1] opacity-95"

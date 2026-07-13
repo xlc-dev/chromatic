@@ -39,27 +39,23 @@ export default function ExportJSON(props: ExportJSONProps) {
   };
 
   return (
-    <div class="p-8 pt-8 relative max-[768px]:p-6 max-[640px]:p-4 max-[640px]:pt-4">
-      <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Export Colorscheme</h2>
-      <p class="text-[#8b949e] text-xs mb-8 leading-relaxed">
+    <div class="p-6 relative max-[768px]:p-5 max-[640px]:p-4">
+      <h2 class="section-heading mb-3">Export Colorscheme</h2>
+      <p class="panel-copy mb-6">
         Export your colorscheme as JSON, then use it with the Chromatic CLI tool to configure your
         applications automatically.
       </p>
-      <div class="flex gap-4 mb-8 max-[640px]:flex-col">
-        <Button onClick={handleExport} class="flex-1 text-xs py-3">
+      <div class="flex gap-4 mb-6 max-[640px]:flex-col">
+        <Button onClick={handleExport} class="flex-1">
           Download JSON
         </Button>
-        <Button
-          onClick={handleCopy}
-          variant={copiedJson() ? "success" : "default"}
-          class="flex-1 text-xs py-3"
-        >
+        <Button onClick={handleCopy} variant={copiedJson() ? "success" : "default"} class="flex-1">
           {copiedJson() ? "Copied!" : "Copy JSON"}
         </Button>
       </div>
       <div>
-        <h2 class="mb-4 text-[#c9d1d9] text-sm font-semibold">Chromatic CLI</h2>
-        <p class="text-[#8b949e] text-xs mb-4 leading-relaxed">
+        <h2 class="section-heading mb-3">Chromatic CLI</h2>
+        <p class="panel-copy mb-4">
           Run the CLI with your exported colorscheme to configure your applications automatically.
           Make sure you have it installed somewhere. Download it from the{" "}
           <a
@@ -79,7 +75,7 @@ export default function ExportJSON(props: ExportJSONProps) {
           <Button
             onClick={handleCopyCommand}
             variant={copiedCommand() ? "success" : "default"}
-            class="text-xs py-1.5 px-3 font-mono"
+            class="px-3 font-mono"
           >
             {copiedCommand() ? "Copied!" : "Copy"}
           </Button>
