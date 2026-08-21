@@ -13,7 +13,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "solid-js": "^1.9.14"
+    "solid-js": "^1.9.15"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
