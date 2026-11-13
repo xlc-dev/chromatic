@@ -2,22 +2,26 @@
   "name": "chromatic",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@11.28.9",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:all": "bun run build && bun run build:cli",
-    "build:cli": "bun scripts/build-cli.ts",
-    "check": "bun run format:check && bunx tsc --noEmit",
+    "build:cli": "node scripts/build-cli.mjs",
+    "check": "pnpm run format:check && tsc --noEmit",
     "preview": "vite preview",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format": "prettier --write . '!pnpm-lock.yaml'",
+    "format:check": "prettier --check . '!pnpm-lock.yaml'"
   },
   "dependencies": {
     "solid-js": "^1.9.14"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "@types/bun": "^1.3.14",
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",

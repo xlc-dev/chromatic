@@ -8,7 +8,6 @@
     "jsxImportSource": "solid-js",
     "allowJs": false,
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
     "noEmit": true,
@@ -20,6 +19,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true,
-    "types": ["bun"]
+    "types": ["node"]
   }
 }

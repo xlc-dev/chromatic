@@ -315,7 +315,7 @@ async function main() {
       continue;
     }
     if (validFlags.includes(arg)) continue;
-    if (arg.startsWith("-")) {
+    if (arg.startsWith("-") && arg !== "-") {
       fail(`Unknown flag: ${arg}`, "Run with --help to see available options.");
     }
     if (!jsonPath) {
