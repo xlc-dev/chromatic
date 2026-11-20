@@ -16,7 +16,7 @@
     "format:check": "prettier --check . '!pnpm-lock.yaml'"
   },
   "dependencies": {
-    "solid-js": "^1.9.14"
+    "solid-js": "^1.9.19"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
