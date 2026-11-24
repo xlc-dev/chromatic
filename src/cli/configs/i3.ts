@@ -6,7 +6,7 @@ import { updateConfigFile, type ConfigUpdate } from "../utils";
 export function configureWindowManager(
   scheme: ColorScheme,
   wmName: "i3" | "sway",
-  configPath?: string
+  configPath?: string,
 ): void {
   const updates: ConfigUpdate[] = [
     {

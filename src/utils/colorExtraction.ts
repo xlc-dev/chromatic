@@ -178,7 +178,7 @@ function assignSamples(samples: Sample[], centroids: Lab[]): Int32Array {
 function accumulate(
   samples: Sample[],
   assignment: Int32Array,
-  clusterCount: number
+  clusterCount: number,
 ): ClusterSums[] {
   const sums: ClusterSums[] = Array.from({ length: clusterCount }, () => ({
     lab: { lightness: 0, a: 0, b: 0 },
@@ -268,7 +268,7 @@ function kMeansClustering(samples: Sample[], k: number): ExtractedColor[] {
 
   return extracted
     .filter((entry) => entry.weight >= MIN_CLUSTER_SHARE)
-    .sort((first, second) => second.weight - first.weight);
+    .toSorted((first, second) => second.weight - first.weight);
 }
 
 export function extractColors(imageData: ImageData, colorCount: number = 12): ExtractedColor[] {

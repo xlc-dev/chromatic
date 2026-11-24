@@ -1,31 +1,33 @@
 {
   "name": "chromatic",
-  "type": "module",
   "private": true,
-  "packageManager": "pnpm@11.28.9",
-  "engines": {
-    "node": ">=22"
-  },
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:cli": "node scripts/build-cli.mjs",
-    "check": "pnpm run format:check && tsc --noEmit",
+    "build:cli": "vite build --mode cli",
+    "check": "pnpm run lint && pnpm run format:check && tsc",
     "preview": "vite preview",
-    "format": "prettier --write . '!pnpm-lock.yaml'",
-    "format:check": "prettier --check . '!pnpm-lock.yaml'"
+    "lint": "oxlint",
+    "format": "oxfmt --write",
+    "format:check": "oxfmt --check"
   },
   "dependencies": {
-    "solid-js": "^1.9.14"
+    "@solidjs/web": "^2.0.3",
+    "solid-js": "^2.0.3"
   },
   "devDependencies": {
+    "@solidjs/vite-plugin": "^3.0.1",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.6",
-    "esbuild": "^0.28.2",
-    "prettier": "^3.9.6",
+    "oxfmt": "^0.80.0",
+    "oxlint": "^1.95.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.2.1",
-    "vite-plugin-solid": "^2.11.14"
-  }
+    "vite": "^8.3.8"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@11.28.9"
 }

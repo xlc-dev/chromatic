@@ -12,7 +12,7 @@ import {
 function updatesForUrgency(
   frameColor: string,
   background: string,
-  foreground: string
+  foreground: string,
 ): ConfigUpdate[] {
   return [
     { pattern: /^\s*frame_color\s*=\s*[^\n]+/m, line: `frame_color = "${frameColor}"` },
@@ -29,17 +29,17 @@ export function configureDunst(scheme: ColorScheme, configPath?: string): void {
   config = updateNamedSection(
     config,
     "urgency_low",
-    updatesForUrgency(scheme.inactiveBorder, scheme.background, scheme.foreground)
+    updatesForUrgency(scheme.inactiveBorder, scheme.background, scheme.foreground),
   );
   config = updateNamedSection(
     config,
     "urgency_normal",
-    updatesForUrgency(scheme.activeBorder, scheme.background, scheme.foreground)
+    updatesForUrgency(scheme.activeBorder, scheme.background, scheme.foreground),
   );
   config = updateNamedSection(
     config,
     "urgency_critical",
-    updatesForUrgency(scheme.urgentBorder, scheme.background, scheme.foreground)
+    updatesForUrgency(scheme.urgentBorder, scheme.background, scheme.foreground),
   );
 
   writeConfigFile(resolvedConfigPath, config);

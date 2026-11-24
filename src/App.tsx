@@ -1,4 +1,5 @@
-import { createSignal, createEffect, onMount } from "solid-js";
+import "./index.css";
+import { createSignal, createEffect, onSettled } from "solid-js";
 import {
   type ColorScheme,
   type ColorSchemeKey,
@@ -11,11 +12,7 @@ import ExportJSON from "./components/ExportJSON";
 import ImportJSON from "./components/ImportJSON";
 import PresetSelector from "./components/PresetSelector";
 import Button from "./components/Button";
-import ErrorMessage from "./components/ErrorMessage";
 import { processImageFile } from "./utils/imageProcessor";
-
-const BASE_URL = import.meta.env["BASE_URL"];
-const faviconUrl = `${BASE_URL}favicon.svg`;
 
 const STORAGE_KEY = "chromatic-colorscheme";
 
@@ -41,14 +38,16 @@ export default function App() {
   const [error, setError] = createSignal<string | null>(null);
   let imageInputRef: HTMLInputElement | undefined;
 
-  createEffect(() => {
-    const currentScheme = scheme();
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(currentScheme));
-    } catch (e) {
-      console.error("Failed to save colorscheme to localStorage:", e);
-    }
-  });
+  createEffect(
+    () => scheme(),
+    (currentScheme) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentScheme));
+      } catch (e) {
+        console.error("Failed to save colorscheme to localStorage:", e);
+      }
+    },
+  );
 
   const [activeTab, setActiveTab] = createSignal<"preview" | "export">("preview");
   let tabGroupRef: HTMLDivElement | undefined;
@@ -70,12 +69,14 @@ export default function App() {
     tabGroupRef.style.setProperty("--indicator-left", `${Math.max(padding, left)}px`);
   };
 
-  createEffect(() => {
-    activeTab();
-    requestAnimationFrame(updateTabIndicator);
-  });
+  createEffect(
+    () => activeTab(),
+    () => {
+      requestAnimationFrame(updateTabIndicator);
+    },
+  );
 
-  onMount(() => {
+  onSettled(() => {
     updateTabIndicator();
     window.addEventListener("resize", updateTabIndicator);
     return () => window.removeEventListener("resize", updateTabIndicator);
@@ -112,9 +113,9 @@ export default function App() {
       const colorScheme = await processImageFile(file);
       setScheme(colorScheme);
       handleTabChange("preview");
-    } catch (error) {
-      console.error("Failed to extract colors from image:", error);
-      setError(error instanceof Error ? error.message : "Failed to extract colors from image.");
+    } catch (err) {
+      console.error("Failed to extract colors from image:", err);
+      setError(err instanceof Error ? err.message : "Failed to extract colors from image.");
       setTimeout(() => setError(null), 5000);
     } finally {
       setImageExtracting(false);
@@ -127,7 +128,11 @@ export default function App() {
       <header class="bg-[#161b22] py-4 border-b border-[#30363d]">
         <div class="max-w-[1600px] mx-auto px-8 flex items-center justify-between gap-8 relative flex-wrap max-[1024px]:px-6 max-[1024px]:gap-4 max-[768px]:px-4 max-[768px]:gap-3 max-[640px]:flex-col max-[640px]:items-stretch max-[640px]:gap-4">
           <div class="flex items-center gap-3 max-[640px]:justify-center">
-            <img src={faviconUrl} alt="Chromatic" class="w-8 h-8" />
+            <img
+              src={`${import.meta.env["BASE_URL"]}favicon.svg`}
+              alt="Chromatic"
+              class="w-8 h-8"
+            />
             <h1 class="text-xl font-semibold bg-gradient-to-r from-[#58a6ff] via-[#bc8cff] via-[#f85149] via-[#3fb950] to-[#58a6ff] bg-[length:200%_100%] bg-clip-text text-transparent animate-chromatic-shift tracking-wide">
               Chromatic
             </h1>
@@ -150,24 +155,28 @@ export default function App() {
             />
             <button
               ref={previewTabRef}
-              class="bg-transparent border-0 py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation"
-              classList={{
-                "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]":
-                  activeTab() === "preview",
-                "text-[#8b949e] hover:text-[#c9d1d9]": activeTab() !== "preview",
-              }}
+              class={[
+                "bg-transparent border-0 py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation",
+                {
+                  "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]":
+                    activeTab() === "preview",
+                  "text-[#8b949e] hover:text-[#c9d1d9]": activeTab() !== "preview",
+                },
+              ]}
               onClick={() => handleTabChange("preview")}
             >
               Color Palette
             </button>
             <button
               ref={exportTabRef}
-              class="bg-transparent border-0 py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation"
-              classList={{
-                "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]":
-                  activeTab() === "export",
-                "text-[#8b949e] hover:text-[#c9d1d9]": activeTab() !== "export",
-              }}
+              class={[
+                "bg-transparent border-0 py-2 px-4 text-sm font-medium cursor-pointer transition-colors duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] rounded relative z-[1] whitespace-nowrap flex items-center justify-center leading-none min-h-[44px] touch-manipulation",
+                {
+                  "text-[#58a6ff] [text-shadow:0_0_8px_rgba(88,166,255,0.5)]":
+                    activeTab() === "export",
+                  "text-[#8b949e] hover:text-[#c9d1d9]": activeTab() !== "export",
+                },
+              ]}
               onClick={() => handleTabChange("export")}
             >
               Export
@@ -210,7 +219,9 @@ export default function App() {
       </main>
       {error() && (
         <div class="fixed top-24 right-4 z-[2000] max-w-xs animate-slide-up">
-          <ErrorMessage message={error()!} />
+          <div class="bg-[#21262d] border border-[#f85149] rounded-lg px-4 py-3 text-[#f85149] text-sm shadow-[0_4px_12px_rgba(248,81,73,0.2)]">
+            {error()!}
+          </div>
         </div>
       )}
     </div>

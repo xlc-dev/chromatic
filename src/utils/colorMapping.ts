@@ -75,9 +75,9 @@ function vividness(entry: ExtractedColor): number {
 function mergeSimilarColors(colors: ExtractedColor[]): ExtractedColor[] {
   const merged: ExtractedColor[] = [];
 
-  for (const entry of [...colors].sort((a, b) => b.weight - a.weight)) {
+  for (const entry of colors.toSorted((a, b) => b.weight - a.weight)) {
     const existing = merged.find(
-      (candidate) => colorDistance(candidate.color, entry.color) < MERGE_DISTANCE
+      (candidate) => colorDistance(candidate.color, entry.color) < MERGE_DISTANCE,
     );
 
     if (!existing) {
@@ -95,7 +95,7 @@ function mergeSimilarColors(colors: ExtractedColor[]): ExtractedColor[] {
     existing.weight = weight;
   }
 
-  return merged.sort((a, b) => b.weight - a.weight);
+  return merged.toSorted((a, b) => b.weight - a.weight);
 }
 
 interface Anchors {
@@ -113,8 +113,8 @@ function selectAnchors(colors: ExtractedColor[]): Anchors {
 
   const substantial = colors.filter((entry) => entry.weight >= 0.03);
   const pool = substantial.length > 0 ? substantial : colors;
-  const sorted = [...pool].sort(
-    (first, second) => calculateBrightness(first.color) - calculateBrightness(second.color)
+  const sorted = pool.toSorted(
+    (first, second) => calculateBrightness(first.color) - calculateBrightness(second.color),
   );
 
   const darkest = sorted[0]?.color ?? { r: 0, g: 0, b: 0 };
@@ -162,9 +162,9 @@ function selectAccents(colors: ExtractedColor[], anchors: Anchors): RGB[] {
     .filter(
       (entry) =>
         colorDistance(entry.color, anchors.background) >= BACKGROUND_DISTANCE &&
-        colorDistance(entry.color, anchors.foreground) >= BACKGROUND_DISTANCE
+        colorDistance(entry.color, anchors.foreground) >= BACKGROUND_DISTANCE,
     )
-    .sort((a, b) => accentScore(b) - accentScore(a));
+    .toSorted((a, b) => accentScore(b) - accentScore(a));
 
   const isDistinct = (color: RGB) =>
     selected.every((existing) => colorDistance(existing, color) >= ACCENT_DISTANCE);
@@ -174,7 +174,7 @@ function selectAccents(colors: ExtractedColor[], anchors: Anchors): RGB[] {
 
     return selected.every(
       (existing) =>
-        saturationOf(existing) < 0.2 || circularHueDistance(hueOf(color), hueOf(existing)) >= 25
+        saturationOf(existing) < 0.2 || circularHueDistance(hueOf(color), hueOf(existing)) >= 25,
     );
   };
 
@@ -193,7 +193,7 @@ function selectAccents(colors: ExtractedColor[], anchors: Anchors): RGB[] {
   }
 
   if (selected.length === 0) {
-    const fallback = [...colors].sort((a, b) => vividness(b) - vividness(a))[0];
+    const fallback = colors.toSorted((a, b) => vividness(b) - vividness(a))[0];
     if (fallback) {
       const amount = calculateBrightness(fallback.color) > 0.4 ? -0.35 : 0.35;
       selected.push(shade(fallback.color, amount));
@@ -216,7 +216,7 @@ function assignSlots(accents: RGB[]): Record<PaletteSlot, RGB> {
     }
   }
 
-  for (const color of [...chromatic].sort((a, b) => hueOf(a) - hueOf(b))) {
+  for (const color of chromatic.toSorted((a, b) => hueOf(a) - hueOf(b))) {
     const openSlots = SLOT_ORDER.filter((slot) => !assigned.has(slot));
     if (openSlots.length === 0) break;
 
@@ -224,7 +224,7 @@ function assignSlots(accents: RGB[]): Record<PaletteSlot, RGB> {
     const closest = openSlots.reduce((best, slot) =>
       circularHueDistance(hue, SLOT_HUES[slot]) < circularHueDistance(hue, SLOT_HUES[best])
         ? slot
-        : best
+        : best,
     );
     assigned.set(closest, color);
   }
@@ -276,14 +276,14 @@ function brighten(color: RGB): RGB {
 
 function pickActiveBorder(accents: Record<PaletteSlot, RGB>): RGB {
   return SLOT_ORDER.map((slot) => accents[slot]).reduce((best, color) =>
-    saturationOf(color) > saturationOf(best) ? color : best
+    saturationOf(color) > saturationOf(best) ? color : best,
   );
 }
 
 function pickUrgentBorder(accents: Record<PaletteSlot, RGB>, active: RGB): RGB {
   const warm = SLOT_ORDER.map((slot) => accents[slot])
     .filter((color) => saturationOf(color) >= 0.2)
-    .sort((a, b) => circularHueDistance(hueOf(a), 0) - circularHueDistance(hueOf(b), 0))[0];
+    .toSorted((a, b) => circularHueDistance(hueOf(a), 0) - circularHueDistance(hueOf(b), 0))[0];
 
   return warm ?? lighten(active, 0.15);
 }

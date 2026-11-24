@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": { "suspicious": "warn" },
+  "ignorePatterns": ["src/data/code/**"],
+  "rules": {
+    "no-unassigned-vars": "off",
+    "unicorn/consistent-function-scoping": "off"
+  }
+}

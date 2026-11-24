@@ -23,17 +23,20 @@ export default function PresetSelector(props: PresetSelectorProps) {
     setIsOpen(false);
   };
 
-  createEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen()) {
-        setIsOpen(false);
-      }
-    };
-    if (isOpen()) {
+  createEffect(
+    () => isOpen(),
+    (open) => {
+      if (!open) return;
+
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setIsOpen(false);
+        }
+      };
       document.addEventListener("keydown", handleEscape);
       return () => document.removeEventListener("keydown", handleEscape);
-    }
-  });
+    },
+  );
 
   return (
     <>

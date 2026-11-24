@@ -5,8 +5,7 @@
     "module": "ESNext",
     "moduleDetection": "force",
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
-    "allowJs": false,
+    "jsxImportSource": "@solidjs/web",
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
@@ -19,6 +18,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true,
-    "types": ["node"]
+    "types": ["node", "vite/client"]
   }
 }
