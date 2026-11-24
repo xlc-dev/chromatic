@@ -7,11 +7,12 @@ interface ColorSwatchProps {
 }
 
 export default function ColorSwatch(props: ColorSwatchProps) {
-  const aspectClass = props.aspectRatio === "wide" ? "aspect-[2/1]" : "aspect-square";
-
   return (
     <div
-      class={`${aspectClass} rounded cursor-pointer relative overflow-hidden transition-all duration-150 border-2 border-white/8 flex flex-col justify-end hover:scale-105 hover:shadow-lg hover:border-white/25 hover:z-10 active:translate-y-0`}
+      class={[
+        props.aspectRatio === "wide" ? "aspect-[2/1]" : "aspect-square",
+        "rounded cursor-pointer relative overflow-hidden transition-all duration-150 border-2 border-white/8 flex flex-col justify-end hover:scale-105 hover:shadow-lg hover:border-white/25 hover:z-10 active:translate-y-0",
+      ]}
       style={{ "background-color": props.color }}
       onClick={props.onClick}
     >

@@ -1,4 +1,4 @@
-import { createSignal, For, Show, createEffect } from "solid-js";
+import { createSignal, For, Show, createEffect, onSettled } from "solid-js";
 import { type ColorScheme } from "../types";
 import codeExamplesData, { type Language, type CodeExample } from "../data/code";
 import { highlightSyntax, type CodeToken } from "../utils/syntaxHighlighter";
@@ -46,7 +46,7 @@ function wrapLine(
   line: CodeLine,
   maxWidthPx: number,
   lineNumberWidthPx: number,
-  font: string
+  font: string,
 ): WrappedLine[] {
   const availableWidth = maxWidthPx - lineNumberWidthPx - 32;
 
@@ -194,7 +194,7 @@ export default function Preview(props: PreviewProps) {
     setWrappedLines(wrapped);
   };
 
-  createEffect(() => {
+  onSettled(() => {
     if (!editorContentRef) return;
 
     updateWrappedLines();
@@ -213,35 +213,41 @@ export default function Preview(props: PreviewProps) {
     };
   });
 
-  createEffect(() => {
-    selectedLanguage();
-    if (editorContentRef) {
-      updateWrappedLines();
-    }
-  });
+  createEffect(
+    () => selectedLanguage(),
+    () => {
+      if (editorContentRef) {
+        updateWrappedLines();
+      }
+    },
+  );
 
   const handleSelectLanguage = (lang: Language) => {
     setSelectedLanguage(lang);
     setIsDropdownOpen(false);
   };
 
-  createEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef && !dropdownRef.contains(e.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
+  createEffect(
+    () => isDropdownOpen(),
+    (open) => {
+      if (!open) return;
 
-    if (isDropdownOpen()) {
-      setTimeout(() => {
+      const handleClickOutside = (e: MouseEvent) => {
+        if (dropdownRef && !dropdownRef.contains(e.target as Node)) {
+          setIsDropdownOpen(false);
+        }
+      };
+
+      const timeout = setTimeout(() => {
         document.addEventListener("click", handleClickOutside);
       }, 0);
-    }
 
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  });
+      return () => {
+        clearTimeout(timeout);
+        document.removeEventListener("click", handleClickOutside);
+      };
+    },
+  );
 
   return (
     <div

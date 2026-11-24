@@ -24,30 +24,6 @@ export interface ColorScheme {
 
 export type ColorSchemeKey = keyof ColorScheme;
 
-export const COLOR_SCHEME_KEYS: ColorSchemeKey[] = [
-  "black",
-  "red",
-  "green",
-  "yellow",
-  "blue",
-  "magenta",
-  "cyan",
-  "white",
-  "brightBlack",
-  "brightRed",
-  "brightGreen",
-  "brightYellow",
-  "brightBlue",
-  "brightMagenta",
-  "brightCyan",
-  "brightWhite",
-  "background",
-  "foreground",
-  "activeBorder",
-  "inactiveBorder",
-  "urgentBorder",
-] as const;
-
 export const defaultColorScheme: ColorScheme = {
   black: "#0c0c0c",
   red: "#c50f1f",
@@ -72,7 +48,28 @@ export const defaultColorScheme: ColorScheme = {
   urgentBorder: "#f85149",
 };
 
-export interface ColorName {
+export const COLOR_SCHEME_KEYS = Object.keys(defaultColorScheme) as ColorSchemeKey[];
+
+export const ANSI_COLOR_KEYS: readonly ColorSchemeKey[] = [
+  "black",
+  "red",
+  "green",
+  "yellow",
+  "blue",
+  "magenta",
+  "cyan",
+  "white",
+  "brightBlack",
+  "brightRed",
+  "brightGreen",
+  "brightYellow",
+  "brightBlue",
+  "brightMagenta",
+  "brightCyan",
+  "brightWhite",
+];
+
+interface ColorName {
   key: ColorSchemeKey;
   label: string;
 }

@@ -159,33 +159,39 @@ export default function ColorPicker(props: ColorPickerProps) {
     setDragType(null);
   };
 
-  createEffect(() => {
-    if (isDragging()) {
+  createEffect(
+    () => isDragging(),
+    (dragging) => {
+      if (!dragging) return;
+
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
       return () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       };
-    }
-  });
+    },
+  );
 
   const closePicker = () => {
     setPickerState(null);
     setPopupVisible(false);
   };
 
-  createEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && pickerState()) {
-        closePicker();
-      }
-    };
-    if (pickerState()) {
+  createEffect(
+    () => pickerState(),
+    (state) => {
+      if (!state) return;
+
+      const handleEscape = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          closePicker();
+        }
+      };
       document.addEventListener("keydown", handleEscape);
       return () => document.removeEventListener("keydown", handleEscape);
-    }
-  });
+    },
+  );
 
   const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -294,7 +300,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                 const currentState = pickerState();
                 if (currentState && popupRef) {
                   const targetElement = document.querySelector(
-                    `[data-color-key="${currentState.key}"]`
+                    `[data-color-key="${currentState.key}"]`,
                   ) as HTMLElement;
                   if (targetElement) {
                     const rect = targetElement.getBoundingClientRect();
@@ -433,7 +439,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                                     e.stopPropagation();
                                     updateRgbChannel(
                                       inputProps.channel,
-                                      Math.min(255, inputProps.value + 1)
+                                      Math.min(255, inputProps.value + 1),
                                     );
                                   }}
                                 >
@@ -447,7 +453,7 @@ export default function ColorPicker(props: ColorPickerProps) {
                                     e.stopPropagation();
                                     updateRgbChannel(
                                       inputProps.channel,
-                                      Math.max(0, inputProps.value - 1)
+                                      Math.max(0, inputProps.value - 1),
                                     );
                                   }}
                                 >

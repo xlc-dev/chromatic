@@ -55,7 +55,7 @@ export function updateConfigFile(
   configPath: string,
   configDir: string | null,
   updates: ConfigUpdate[],
-  preprocess?: (content: string) => string
+  preprocess?: (content: string) => string,
 ): void {
   if (configDir) {
     ensureDir(configDir);
@@ -77,7 +77,7 @@ export function updateConfigFile(
 export function updateNamedSection(
   content: string,
   sectionName: string,
-  updates: ConfigUpdate[]
+  updates: ConfigUpdate[],
 ): string {
   const escapedSectionName = sectionName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const sectionRegex = new RegExp(`(\\[${escapedSectionName}\\]\\s*\\n?)([\\s\\S]*?)(?=\\n\\[|$)`);

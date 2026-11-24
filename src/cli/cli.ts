@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { readFileSync, existsSync, statSync } from "fs";
 import { createInterface } from "readline";
 import type { ColorScheme } from "../types";
@@ -11,12 +12,13 @@ type AppConfig = {
   key: string;
   name: string;
   group: AppGroup;
-  appFlag: string;
-  pathFlag: string;
   pathKind: PathKind;
   platforms: readonly Platform[];
   configure: (scheme: ColorScheme, overridePath?: string) => Promise<void>;
 };
+
+const appFlag = (app: AppConfig) => `--${app.key}`;
+const pathFlag = (app: AppConfig) => `--${app.key}-path`;
 
 const LINUX = ["linux"] as const satisfies readonly Platform[];
 const LINUX_MACOS = ["linux", "darwin"] as const satisfies readonly Platform[];
@@ -27,8 +29,6 @@ const APPS: AppConfig[] = [
     key: "vim",
     name: "Vim",
     group: "Editors",
-    appFlag: "--vim",
-    pathFlag: "--vim-path",
     pathKind: "file",
     platforms: ALL_PLATFORMS,
     configure: async (scheme, overridePath) =>
@@ -38,8 +38,6 @@ const APPS: AppConfig[] = [
     key: "vscode",
     name: "VSCode",
     group: "Editors",
-    appFlag: "--vscode",
-    pathFlag: "--vscode-path",
     pathKind: "dir",
     platforms: ALL_PLATFORMS,
     configure: async (scheme, overridePath) =>
@@ -49,8 +47,6 @@ const APPS: AppConfig[] = [
     key: "cursor",
     name: "Cursor",
     group: "Editors",
-    appFlag: "--cursor",
-    pathFlag: "--cursor-path",
     pathKind: "dir",
     platforms: ALL_PLATFORMS,
     configure: async (scheme, overridePath) =>
@@ -60,8 +56,6 @@ const APPS: AppConfig[] = [
     key: "neovim",
     name: "Neovim",
     group: "Editors",
-    appFlag: "--neovim",
-    pathFlag: "--neovim-path",
     pathKind: "file",
     platforms: ALL_PLATFORMS,
     configure: async (scheme, overridePath) =>
@@ -71,8 +65,6 @@ const APPS: AppConfig[] = [
     key: "foot",
     name: "Foot",
     group: "Terminals",
-    appFlag: "--foot",
-    pathFlag: "--foot-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -82,8 +74,6 @@ const APPS: AppConfig[] = [
     key: "alacritty",
     name: "Alacritty",
     group: "Terminals",
-    appFlag: "--alacritty",
-    pathFlag: "--alacritty-path",
     pathKind: "file",
     platforms: ALL_PLATFORMS,
     configure: async (scheme, overridePath) =>
@@ -93,8 +83,6 @@ const APPS: AppConfig[] = [
     key: "kitty",
     name: "Kitty",
     group: "Terminals",
-    appFlag: "--kitty",
-    pathFlag: "--kitty-path",
     pathKind: "file",
     platforms: LINUX_MACOS,
     configure: async (scheme, overridePath) =>
@@ -104,8 +92,6 @@ const APPS: AppConfig[] = [
     key: "wezterm",
     name: "WezTerm",
     group: "Terminals",
-    appFlag: "--wezterm",
-    pathFlag: "--wezterm-path",
     pathKind: "dir",
     platforms: ALL_PLATFORMS,
     configure: async (scheme, overridePath) =>
@@ -115,8 +101,6 @@ const APPS: AppConfig[] = [
     key: "xresources",
     name: "Xresources",
     group: "Terminals",
-    appFlag: "--xresources",
-    pathFlag: "--xresources-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -126,8 +110,6 @@ const APPS: AppConfig[] = [
     key: "i3",
     name: "i3",
     group: "Window Managers",
-    appFlag: "--i3",
-    pathFlag: "--i3-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -137,8 +119,6 @@ const APPS: AppConfig[] = [
     key: "sway",
     name: "Sway",
     group: "Window Managers",
-    appFlag: "--sway",
-    pathFlag: "--sway-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -148,8 +128,6 @@ const APPS: AppConfig[] = [
     key: "river",
     name: "River",
     group: "Window Managers",
-    appFlag: "--river",
-    pathFlag: "--river-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -159,8 +137,6 @@ const APPS: AppConfig[] = [
     key: "hyprland",
     name: "Hyprland",
     group: "Window Managers",
-    appFlag: "--hyprland",
-    pathFlag: "--hyprland-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -170,8 +146,6 @@ const APPS: AppConfig[] = [
     key: "mango",
     name: "Mango",
     group: "Window Managers",
-    appFlag: "--mango",
-    pathFlag: "--mango-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -181,8 +155,6 @@ const APPS: AppConfig[] = [
     key: "gtk3",
     name: "GTK 3",
     group: "GTK",
-    appFlag: "--gtk3",
-    pathFlag: "--gtk3-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -192,8 +164,6 @@ const APPS: AppConfig[] = [
     key: "gtk4",
     name: "GTK 4",
     group: "GTK",
-    appFlag: "--gtk4",
-    pathFlag: "--gtk4-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -203,8 +173,6 @@ const APPS: AppConfig[] = [
     key: "rofi",
     name: "Rofi",
     group: "Other",
-    appFlag: "--rofi",
-    pathFlag: "--rofi-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -214,8 +182,6 @@ const APPS: AppConfig[] = [
     key: "dunst",
     name: "Dunst",
     group: "Other",
-    appFlag: "--dunst",
-    pathFlag: "--dunst-path",
     pathKind: "file",
     platforms: LINUX,
     configure: async (scheme, overridePath) =>
@@ -246,7 +212,7 @@ function buildHelpText(): string {
   const appSections = groups
     .map((group) => {
       const lines = APPS.filter((app) => app.group === group).map(
-        (app) => `  ${app.appFlag.padEnd(14)} Configure ${app.name}`
+        (app) => `  ${appFlag(app).padEnd(14)} Configure ${app.name}`,
       );
       return `${group}:\n${lines.join("\n")}`;
     })
@@ -255,7 +221,7 @@ function buildHelpText(): string {
   const pathSection = APPS.map((app) => {
     const label = app.pathKind === "dir" ? "<dir>" : "<path>";
     const target = app.pathKind === "dir" ? "directory" : "path";
-    return `  ${`${app.pathFlag} ${label}`.padEnd(26)} Override ${app.name} ${target}`;
+    return `  ${`${pathFlag(app)} ${label}`.padEnd(26)} Override ${app.name} ${target}`;
   }).join("\n");
 
   return `
@@ -290,9 +256,9 @@ async function main() {
     process.exit(0);
   }
 
-  const appFlags = APPS.map((app) => app.appFlag);
-  const pathFlags = APPS.map((app) => app.pathFlag);
-  const pathFlagToApp = new Map(APPS.map((app) => [app.pathFlag, app]));
+  const appFlags = APPS.map((app) => appFlag(app));
+  const pathFlags = APPS.map((app) => pathFlag(app));
+  const pathFlagToApp = new Map(APPS.map((app) => [pathFlag(app), app]));
   const validFlags = ["--help", "-h", "--yes", "-y", "--all", ...appFlags, ...pathFlags];
 
   let jsonPath: string | null = null;
@@ -371,7 +337,7 @@ async function main() {
   const hasExplicitFlags = args.some((arg) => appFlags.includes(arg));
   const configAll = args.includes("--all") || !hasExplicitFlags;
   const configs: Array<[boolean, () => Promise<void>, string]> = APPS.map((app) => [
-    (configAll && app.platforms.includes(process.platform)) || args.includes(app.appFlag),
+    (configAll && app.platforms.includes(process.platform)) || args.includes(appFlag(app)),
     () => app.configure(scheme, pathOverrides[app.key]),
     app.name,
   ]);
@@ -387,7 +353,7 @@ async function main() {
     appsToConfigure.forEach((app) => console.log(`  - ${app}`));
     console.log();
     const confirmed = await promptConfirmation(
-      "This will overwrite existing configuration. Continue? (y/N): "
+      "This will overwrite existing configuration. Continue? (y/N): ",
     );
     if (!confirmed) {
       console.log("Aborted.");

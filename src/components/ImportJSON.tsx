@@ -1,7 +1,6 @@
 import { createSignal } from "solid-js";
 import { type ColorScheme, COLOR_SCHEME_KEYS } from "../types";
 import Button from "./Button";
-import Divider from "./Divider";
 
 interface ImportJSONProps {
   onImport: (scheme: ColorScheme) => void;
@@ -12,7 +11,7 @@ const validateColorScheme = (data: unknown): data is ColorScheme => {
     return false;
   }
   return COLOR_SCHEME_KEYS.every(
-    (key) => key in data && typeof (data as Record<string, unknown>)[key] === "string"
+    (key) => key in data && typeof (data as Record<string, unknown>)[key] === "string",
   );
 };
 
@@ -38,7 +37,7 @@ export default function ImportJSON(props: ImportJSONProps) {
         setError("Invalid colorscheme format. Missing required color fields.");
         return false;
       }
-    } catch (e) {
+    } catch {
       setError("Failed to parse JSON. Please ensure it's valid JSON.");
       return false;
     }
@@ -95,7 +94,9 @@ export default function ImportJSON(props: ImportJSONProps) {
         </label>
       </div>
 
-      <Divider />
+      <div class="flex items-center text-center my-6 text-[#8b949e] text-xs before:content-[''] before:flex-1 before:border-b before:border-[#30363d] after:content-[''] after:flex-1 after:border-b after:border-[#30363d]">
+        <span class="px-4">or</span>
+      </div>
 
       <div class="flex flex-col gap-4">
         <label for="json-paste" class="text-[#c9d1d9] text-xs font-medium uppercase tracking-wide">

@@ -1,6 +1,6 @@
 import { homedir } from "os";
 import { dirname, join } from "path";
-import type { ColorScheme } from "../../types";
+import type { ColorScheme, ColorSchemeKey } from "../../types";
 import {
   readConfigFile,
   writeConfigFile,
@@ -9,6 +9,18 @@ import {
   type ConfigUpdate,
 } from "../utils";
 
+const ANSI_NAMES = ["black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"] as const;
+const BRIGHT_KEYS = [
+  "brightBlack",
+  "brightRed",
+  "brightGreen",
+  "brightYellow",
+  "brightBlue",
+  "brightMagenta",
+  "brightCyan",
+  "brightWhite",
+] as const satisfies readonly ColorSchemeKey[];
+
 export function configureAlacritty(scheme: ColorScheme, configPath?: string): void {
   const resolvedConfigPath =
     configPath ??
@@ -16,7 +28,7 @@ export function configureAlacritty(scheme: ColorScheme, configPath?: string): vo
       ? join(
           process.env["APPDATA"] || join(homedir(), "AppData", "Roaming"),
           "alacritty",
-          "alacritty.toml"
+          "alacritty.toml",
         )
       : join(homedir(), ".config", "alacritty", "alacritty.toml"));
 
@@ -47,49 +59,25 @@ export function configureAlacritty(scheme: ColorScheme, configPath?: string): vo
     config = updateOrAppendLine(config, pattern, line);
   }
 
-  const normalSectionMatch = config.match(/\[colors\.normal\]([\s\S]*?)(?=\[|$)/);
-  if (normalSectionMatch && normalSectionMatch[1]) {
-    let normalSection = normalSectionMatch[1];
-    const normalUpdates: ConfigUpdate[] = [
-      { pattern: /^\s*black\s*=\s*'[^']+'/m, line: `black = '${scheme.black}'` },
-      { pattern: /^\s*red\s*=\s*'[^']+'/m, line: `red = '${scheme.red}'` },
-      { pattern: /^\s*green\s*=\s*'[^']+'/m, line: `green = '${scheme.green}'` },
-      { pattern: /^\s*yellow\s*=\s*'[^']+'/m, line: `yellow = '${scheme.yellow}'` },
-      { pattern: /^\s*blue\s*=\s*'[^']+'/m, line: `blue = '${scheme.blue}'` },
-      { pattern: /^\s*magenta\s*=\s*'[^']+'/m, line: `magenta = '${scheme.magenta}'` },
-      { pattern: /^\s*cyan\s*=\s*'[^']+'/m, line: `cyan = '${scheme.cyan}'` },
-      { pattern: /^\s*white\s*=\s*'[^']+'/m, line: `white = '${scheme.white}'` },
-    ];
-    for (const { pattern, line } of normalUpdates) {
-      normalSection = updateOrAppendLine(normalSection, pattern, line);
-    }
-    config = config.replace(
-      /\[colors\.normal\]([\s\S]*?)(?=\[|$)/,
-      `[colors.normal]${normalSection}`
-    );
-  }
+  const updateSection = (section: "normal" | "bright", keys: readonly ColorSchemeKey[]) => {
+    const sectionPattern = new RegExp(`\\[colors\\.${section}\\]([\\s\\S]*?)(?=\\[|$)`);
+    const match = config.match(sectionPattern);
+    if (!match?.[1]) return;
 
-  const brightSectionMatch = config.match(/\[colors\.bright\]([\s\S]*?)(?=\[|$)/);
-  if (brightSectionMatch && brightSectionMatch[1]) {
-    let brightSection = brightSectionMatch[1];
-    const brightUpdates: ConfigUpdate[] = [
-      { pattern: /^\s*black\s*=\s*'[^']+'/m, line: `black = '${scheme.brightBlack}'` },
-      { pattern: /^\s*red\s*=\s*'[^']+'/m, line: `red = '${scheme.brightRed}'` },
-      { pattern: /^\s*green\s*=\s*'[^']+'/m, line: `green = '${scheme.brightGreen}'` },
-      { pattern: /^\s*yellow\s*=\s*'[^']+'/m, line: `yellow = '${scheme.brightYellow}'` },
-      { pattern: /^\s*blue\s*=\s*'[^']+'/m, line: `blue = '${scheme.brightBlue}'` },
-      { pattern: /^\s*magenta\s*=\s*'[^']+'/m, line: `magenta = '${scheme.brightMagenta}'` },
-      { pattern: /^\s*cyan\s*=\s*'[^']+'/m, line: `cyan = '${scheme.brightCyan}'` },
-      { pattern: /^\s*white\s*=\s*'[^']+'/m, line: `white = '${scheme.brightWhite}'` },
-    ];
-    for (const { pattern, line } of brightUpdates) {
-      brightSection = updateOrAppendLine(brightSection, pattern, line);
+    let body = match[1];
+    for (const [index, name] of ANSI_NAMES.entries()) {
+      body = updateOrAppendLine(
+        body,
+        new RegExp(`^\\s*${name}\\s*=\\s*'[^']+'`, "m"),
+        `${name} = '${scheme[keys[index]!]}'`,
+      );
     }
-    config = config.replace(
-      /\[colors\.bright\]([\s\S]*?)(?=\[|$)/,
-      `[colors.bright]${brightSection}`
-    );
-  }
+
+    config = config.replace(sectionPattern, `[colors.${section}]${body}`);
+  };
+
+  updateSection("normal", ANSI_NAMES);
+  updateSection("bright", BRIGHT_KEYS);
 
   writeConfigFile(resolvedConfigPath, config);
 }

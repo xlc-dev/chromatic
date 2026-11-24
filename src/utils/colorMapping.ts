@@ -111,8 +111,8 @@ export function mapColorsToScheme(extractedColors: RGB[]): ColorScheme {
   }
 
   const filteredColors = filterSimilarColors(extractedColors, 25);
-  const sortedByBrightness = [...filteredColors].sort(
-    (a, b) => calculateBrightness(a) - calculateBrightness(b)
+  const sortedByBrightness = filteredColors.toSorted(
+    (a, b) => calculateBrightness(a) - calculateBrightness(b),
   );
 
   const darkest = sortedByBrightness[0];
@@ -250,7 +250,7 @@ export function mapColorsToScheme(extractedColors: RGB[]): ColorScheme {
         : (filteredColors[Math.floor(filteredColors.length * 0.7)] ?? blue);
 
   const redColors = vibrantColors.filter(
-    (c) => getHueCategory(rgbToHsl(c.r, c.g, c.b).h) === "red"
+    (c) => getHueCategory(rgbToHsl(c.r, c.g, c.b).h) === "red",
   );
   const urgentBorder =
     redColors.length > 0 && redColors[0]

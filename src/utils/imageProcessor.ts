@@ -11,7 +11,7 @@ export async function processImageFile(file: File): Promise<ColorScheme> {
     const img = new Image();
     const imageUrl = URL.createObjectURL(file);
 
-    img.onload = () => {
+    img.addEventListener("load", () => {
       try {
         const maxSize = 500;
         let width = img.width;
@@ -50,12 +50,12 @@ export async function processImageFile(file: File): Promise<ColorScheme> {
         URL.revokeObjectURL(imageUrl);
         reject(e);
       }
-    };
+    });
 
-    img.onerror = () => {
+    img.addEventListener("error", () => {
       URL.revokeObjectURL(imageUrl);
       reject(new Error("Failed to load image. Please try another file."));
-    };
+    });
 
     img.src = imageUrl;
   });

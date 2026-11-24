@@ -37,5 +37,5 @@ export function configureRiver(scheme: ColorScheme, configPath?: string): void {
     execSync(`riverctl border-color-focused ${focusedColor}`, { stdio: "ignore" });
     execSync(`riverctl border-color-unfocused ${unfocusedColor}`, { stdio: "ignore" });
     execSync(`riverctl border-color-urgent ${urgentColor}`, { stdio: "ignore" });
-  } catch (error) {}
+  } catch {}
 }

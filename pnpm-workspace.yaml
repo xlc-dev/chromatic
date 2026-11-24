@@ -1,2 +1,6 @@
-allowBuilds:
-  esbuild: true
+autoInstallPeers: false
+minimumReleaseAgeExclude:
+  - "@oxfmt/*"
+  - "@oxlint/*"
+  - oxfmt
+  - oxlint

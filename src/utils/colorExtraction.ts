@@ -4,7 +4,7 @@ export interface RGB {
   b: number;
 }
 
-export interface Cluster {
+interface Cluster {
   centroid: RGB;
   points: RGB[];
 }
